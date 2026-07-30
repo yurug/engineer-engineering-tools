@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    // Overrides the monorepo's shared CommonJS setting (step 2 bundle-
+    // budget finding, package.json's own header): this package's critical
+    // consumers are bundlers (Vite/Rollup, forebrief's and eventually
+    // backbrief's own web packages), and only tree-shakeable ESM output
+    // lets Rollup drop the zod code paths a given spec schema doesn't use.
+    // "bundler" resolution (not "node16"/"nodenext") keeps this package's
+    // existing extensionless relative imports (`from "../envelope"`)
+    // valid -- switching to strict Node ESM resolution would additionally
+    // require a `.js` suffix on every relative import across the package.
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext"
+  },
+  "include": ["src"]
+}

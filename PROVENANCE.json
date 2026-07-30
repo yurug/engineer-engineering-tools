@@ -1,0 +1,23 @@
+{
+  "publishedFrom": {
+    "brief": "private",
+    "backbrief": "private",
+    "forebrief": "private",
+    "inbrief": "private"
+  },
+  "packages": [
+    "brief-shared",
+    "brief-core",
+    "brief-primitives",
+    "backbrief-shared",
+    "backbrief-server",
+    "backbrief-web",
+    "backbrief-cli",
+    "forebrief-server",
+    "forebrief-web",
+    "forebrief-cli",
+    "inbrief-server",
+    "inbrief-web",
+    "inbrief-cli"
+  ]
+}

@@ -1,0 +1,249 @@
+/* Deliberately plain. Step 1 is about whether the session works, and a visual
+   language is its own decision nobody has made yet. The one thing carrying real
+   weight is that .conjecture cannot be mistaken for .grounded (P1). */
+:root {
+  --fg: #1a1a1a;
+  --muted: #666;
+  --warn: #8a3d00;
+  --line: #ddd;
+}
+body {
+  margin: 0;
+  font:
+    16px/1.6 system-ui,
+    sans-serif;
+  color: var(--fg);
+}
+.app,
+.closing {
+  max-width: 42rem;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+.mode {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.question {
+  font-size: 1.5rem;
+  margin: 0.25rem 0 1rem;
+}
+.answer {
+  font-size: 1.125rem;
+}
+.grounding {
+  list-style: none;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  padding-top: 0.75rem;
+  font-size: 0.9rem;
+}
+.grounding .grounded {
+  color: var(--muted);
+}
+/* Unmistakable, not subtle: a reader must not have to notice a shade. */
+.grounding .conjecture {
+  color: var(--warn);
+  background: #fff6ef;
+  border-left: 3px solid var(--warn);
+  padding: 0.4rem 0.6rem;
+}
+.claims {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0 0.5rem;
+}
+.claims button[aria-pressed="true"] {
+  outline: 2px solid var(--fg);
+}
+.current {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+.session-nav {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 1rem;
+}
+.session-nav .end {
+  margin-left: auto;
+}
+.empty {
+  color: var(--muted);
+}
+
+/* The opening is orientation, not a syllabus: one line of intent and the shape
+   of the path. Kept visually quiet for the same reason it is kept short. */
+.opening .intent {
+  font-size: 1.25rem;
+}
+.opening .note {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+/* Collapsed by default (ADR-022): redundancy costs a knowledgeable reader even
+   when they ignore it, and the harm is weakest when it is separated and
+   skippable rather than permanently on screen. */
+.path-view {
+  margin: 1rem 0;
+  font-size: 0.9rem;
+}
+.path-view .count {
+  color: var(--muted);
+}
+.path-view .here {
+  font-weight: 600;
+}
+.path-view .held {
+  color: var(--muted);
+}
+
+/* The source reference is a control, not decoration: it opens the lines it names,
+   adjacent to the claim (contiguity, the largest effect measured). */
+.grounding .ref {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+.excerpt {
+  margin: 0.5rem 0 0;
+  padding: 0.6rem 0.8rem;
+  background: #f6f6f6;
+  border-left: 3px solid var(--line);
+  overflow-x: auto;
+  font-size: 0.85rem;
+  white-space: pre;
+}
+.excerpt.empty {
+  font-style: italic;
+  color: var(--muted);
+  white-space: normal;
+}
+.excerpt-note {
+  margin: 0.3rem 0 0;
+  font-size: 0.8rem;
+  color: var(--warn);
+}
+
+/* The question box (ADR-030). It shipped with no rules at all, so a label and a
+   textarea are both inline and shared one line, and the textarea kept its default
+   two-column size. Still deliberately plain; this only makes it a block. */
+.question-box {
+  display: block;
+  margin: 1.5rem 0;
+  padding: 0.9rem 1rem;
+  background: #fafafa;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.question-box label {
+  display: block;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+.question-box textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.95rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  resize: vertical;
+}
+.question-box-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.question-box .question-failed {
+  color: var(--warn);
+}
+
+/* One button rule across the session, so the controls do not look assembled from
+   three different afternoons. A visual language is still undecided; this is only
+   the absence of one being consistent. */
+.claims button,
+.session-nav button,
+.question-box button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+  color: var(--fg);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.claims button:hover:not(:disabled),
+.session-nav button:hover:not(:disabled),
+.question-box button:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+.claims button:disabled,
+.session-nav button:disabled,
+.question-box button:disabled {
+  color: var(--muted);
+  cursor: default;
+}
+.session-nav {
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* Coming back (ADR-033). The rotted list is the only thing on this screen the
+   engineer would otherwise act on while wrong, so it is the one thing that is not
+   quiet. */
+.returning .rotted {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1rem;
+  background: #fff6ef;
+  border-left: 3px solid var(--warn);
+}
+.returning .rotted h2 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: var(--warn);
+}
+.returning .rotted ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1rem;
+}
+.returning .rotted button {
+  font: inherit;
+  background: none;
+  border: none;
+  padding: 0;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline dotted;
+}
+.returning button {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.35rem 0.75rem;
+  color: var(--fg);
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+}

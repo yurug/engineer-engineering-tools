@@ -1,0 +1,25 @@
+{
+  "name": "@backbrief/server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "The backbrief HTTP/WS server: event store, citation validation, session lifecycle.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@brief/core": "*",
+    "@backbrief/shared": "*",
+    "@hono/node-server": "^2.0.8",
+    "hono": "^4.12.29",
+    "minimatch": "^10.2.5",
+    "ulid": "^3.0.2",
+    "ws": "^8.21.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.18.1"
+  }
+}

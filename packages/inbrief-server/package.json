@@ -1,0 +1,17 @@
+{
+  "name": "@inbrief/server",
+  "version": "0.1.0",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@brief/core": "*",
+    "@brief/shared": "*",
+    "@hono/node-server": "^2.0.12",
+    "hono": "^4.12.32",
+    "zod": "^4.4.3"
+  }
+}

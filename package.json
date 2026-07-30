@@ -1,0 +1,20 @@
+{
+  "name": "engineer-engineering-tools",
+  "private": true,
+  "version": "0.1.0",
+  "description": "backbrief, forebrief and inbrief — the tools an engineer uses to steer agentic development — and the library they share.",
+  "workspaces": [
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "tsc -b && npm run build --workspaces --if-present",
+    "install_tools": "./install.sh"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.43",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "packages/brief-shared"
+    },
+    {
+      "path": "packages/brief-core"
+    },
+    {
+      "path": "packages/brief-primitives"
+    },
+    {
+      "path": "packages/backbrief-shared"
+    },
+    {
+      "path": "packages/backbrief-server"
+    },
+    {
+      "path": "packages/backbrief-web"
+    },
+    {
+      "path": "packages/backbrief-cli"
+    },
+    {
+      "path": "packages/forebrief-server"
+    },
+    {
+      "path": "packages/forebrief-web"
+    },
+    {
+      "path": "packages/forebrief-cli"
+    },
+    {
+      "path": "packages/inbrief-server"
+    },
+    {
+      "path": "packages/inbrief-web"
+    },
+    {
+      "path": "packages/inbrief-cli"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "@inbrief/cli",
+  "version": "0.1.0",
+  "private": true,
+  "bin": {
+    "inbrief": "dist/bin/inbrief.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@brief/core": "*",
+    "@brief/shared": "*",
+    "@inbrief/server": "*"
+  }
+}

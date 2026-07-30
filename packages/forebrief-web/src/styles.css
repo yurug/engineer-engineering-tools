@@ -1,0 +1,474 @@
+/* Stylesheet -- ports mock/round2-cards.html's palette and card anatomy
+   (the user-approved reference, kb/plan.md step 3's brief) into a real,
+   theme-aware stylesheet. Colour vocabulary: --ok (grounded) / --conj
+   (conjecture) / --warn (costly) are the ONLY hue-bearing tokens --
+   everything else is neutral, matching the grounded-vs-conjecture chrome
+   ADR-002 requires being the one thing colour communicates here. */
+:root {
+  --bg: #f7f8f7;
+  --ink: #1d2426;
+  --muted: #5f6b6e;
+  --line: #dde3e1;
+  --panel: #ffffff;
+  --accent: #0e7a6f;
+  --accent-ink: #ffffff;
+  --conj: #8a6d1f;
+  --chip: #eef2f0;
+  --ok: #0e7a6f;
+  --warn: #a15c00;
+  --danger: #b3392e;
+  --code: #eceeed;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #131717;
+    --ink: #e4e8e6;
+    --muted: #93a09c;
+    --line: #2a3231;
+    --panel: #1a2020;
+    --accent: #3fb8a9;
+    --accent-ink: #0c1514;
+    --conj: #d4b45a;
+    --chip: #232b2a;
+    --ok: #3fb8a9;
+    --warn: #e0a558;
+    --danger: #e2766b;
+    --code: #202726;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131717;
+  --ink: #e4e8e6;
+  --muted: #93a09c;
+  --line: #2a3231;
+  --panel: #1a2020;
+  --accent: #3fb8a9;
+  --accent-ink: #0c1514;
+  --conj: #d4b45a;
+  --chip: #232b2a;
+  --ok: #3fb8a9;
+  --warn: #e0a558;
+  --danger: #e2766b;
+  --code: #202726;
+}
+:root[data-theme="light"] {
+  --bg: #f7f8f7;
+  --ink: #1d2426;
+  --muted: #5f6b6e;
+  --line: #dde3e1;
+  --panel: #ffffff;
+  --accent: #0e7a6f;
+  --accent-ink: #ffffff;
+  --conj: #8a6d1f;
+  --chip: #eef2f0;
+  --ok: #0e7a6f;
+  --warn: #a15c00;
+  --danger: #b3392e;
+  --code: #eceeed;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    sans-serif;
+  line-height: 1.5;
+}
+.app {
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 2rem 1rem 6rem;
+}
+
+.empty,
+.app-error p {
+  color: var(--muted);
+}
+
+.banner {
+  background: var(--panel);
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.banner code {
+  display: block;
+  margin-top: 0.4rem;
+  font-family: ui-monospace, Menlo, monospace;
+  background: var(--code);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+}
+.banner .pending-note {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.awaiting-reconciliation {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.awaiting-reconciliation h2 {
+  font-size: 0.95rem;
+  margin: 0 0 0.4rem;
+}
+.awaiting-reconciliation .note {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+.awaiting-reconciliation ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.78rem;
+}
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1.4rem 1.5rem;
+}
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 1.2rem;
+}
+.kind {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.prog {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.card h2 {
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  margin: 0.2rem 0 0.4rem;
+}
+.context {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 0 0 1rem;
+}
+.already-decided {
+  font-size: 0.85rem;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+
+.opt {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.9rem 1rem;
+  margin: 0.6rem 0;
+  cursor: pointer;
+}
+.opt[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.75;
+}
+.opt.selected {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+.opt .head {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+.opt .key {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 0.05rem 0.4rem;
+}
+.opt .label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.opt .default-tag {
+  font-size: 0.68rem;
+  font-family: ui-monospace, Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+.cons {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.con {
+  font-size: 0.85rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 4px;
+}
+.con.grounded {
+  background: var(--chip);
+  border-left: 3px solid var(--ok);
+}
+.con.conjecture {
+  border: 1px dashed var(--conj);
+  color: var(--muted);
+}
+.con .tag {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-right: 0.4rem;
+}
+.con.grounded .tag {
+  color: var(--ok);
+}
+.con.conjecture .tag {
+  color: var(--conj);
+}
+.con .cite {
+  display: block;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+  overflow-x: auto;
+}
+.rev {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-family: ui-monospace, Menlo, monospace;
+}
+.rev .badge {
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+}
+.rev.reversible .badge[data-grounding="grounded"] {
+  color: var(--ok);
+  border-color: var(--ok);
+}
+.rev.costly .badge {
+  color: var(--warn);
+  border-color: var(--warn);
+}
+.rev .badge[data-grounding="conjecture"] {
+  border-style: dashed;
+  color: var(--conj);
+  border-color: var(--conj);
+}
+
+.nudge {
+  color: var(--warn);
+  font-size: 0.85rem;
+  margin-top: 0.8rem;
+}
+
+.inputs {
+  margin-top: 1rem;
+}
+.inputs label {
+  display: block;
+  font-size: 0.75rem;
+  font-family: ui-monospace, Menlo, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+textarea {
+  width: 100%;
+  min-height: 3.2rem;
+  margin: 0.3rem 0 0.6rem;
+  background: var(--code);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  padding: 0.5rem 0.6rem;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.thread {
+  margin-top: 1rem;
+  border-top: 1px solid var(--line);
+  padding-top: 0.6rem;
+  font-size: 0.82rem;
+}
+.thread-pending {
+  color: var(--warn);
+  margin-bottom: 0.3rem;
+}
+.thread-entry {
+  color: var(--muted);
+  padding: 0.15rem 0;
+}
+
+.done-mark {
+  color: var(--ok);
+  font-size: 0.9rem;
+}
+#summary {
+  margin: 0.8rem 0;
+}
+.sum-row {
+  font-size: 0.85rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--line);
+}
+.sum-row b {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  margin-right: 0.4rem;
+}
+.records {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  list-style: none;
+  padding: 0;
+}
+.records li {
+  padding: 0.2rem 0;
+}
+
+/* AwaitingReconciliationList: prompt-first entries (card-copy.md derived-surfaces rule) */
+.awaiting-reconciliation li {
+  margin: 0.35rem 0;
+  line-height: 1.45;
+}
+.awaiting-reconciliation .prompt {
+  font-weight: 600;
+}
+.awaiting-reconciliation .applied {
+  color: var(--muted, #666);
+}
+.awaiting-reconciliation .rationale {
+  color: var(--muted, #666);
+  font-style: italic;
+}
+.awaiting-reconciliation .locator {
+  color: var(--muted, #999);
+  font-family: ui-monospace, monospace;
+  font-size: 0.78em;
+}
+.awaiting-reconciliation .reconcile-actions {
+  margin: 0.3rem 0 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  font-family: initial;
+}
+.awaiting-reconciliation .override-panel {
+  margin: 0.4rem 0 0.8rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px dashed var(--line, #ccc);
+  border-radius: 6px;
+  font-family: initial;
+}
+.awaiting-reconciliation .override-panel label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted, #666);
+  margin-top: 0.4rem;
+}
+.awaiting-reconciliation .override-panel select {
+  display: block;
+  margin: 0.2rem 0 0.4rem;
+  font: inherit;
+}
+
+/* CompletionScreen records: seq moved to a muted trailing locator (card-copy.md rule 6) */
+.records .locator {
+  color: var(--muted, #999);
+  font-size: 0.85em;
+}
+
+/* KeyHintBar: NF3 discoverability (mirrors the approved mock's bottom bar) */
+.key-hint-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--panel, #fff);
+  border-top: 1px solid var(--line, #ddd);
+  font-size: 0.8rem;
+}
+.key-hint-bar .keys {
+  color: var(--muted, #666);
+}
+.key-hint-bar .keys b {
+  color: inherit;
+  font-weight: 650;
+}
+.key-hint-bar .nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+.key-hint-bar .pos {
+  color: var(--muted, #666);
+  font-variant-numeric: tabular-nums;
+}
+.key-hint-bar button {
+  font: inherit;
+  padding: 0.2rem 0.6rem;
+  cursor: pointer;
+}
+.app {
+  padding-bottom: 3.5rem; /* room for the fixed key-hint bar */
+}
+
+/* CompareView (kb/primitives/implementation-slices.md Step 2): the toggle
+   is a visible control (NF3) alongside the `m` binding; the matrix itself
+   is @brief/primitives's own rendered markup -- only container
+   placement lives here, no per-cell styling (that chrome is the
+   library's, per its own tokens). */
+.view-toggle {
+  margin: 0 0 1rem;
+}
+.view-toggle button {
+  font: inherit;
+  padding: 0.3rem 0.75rem;
+  cursor: pointer;
+}
+.compare-view {
+  overflow-x: auto;
+}
+.compare-error {
+  color: var(--danger, #b3392e);
+}

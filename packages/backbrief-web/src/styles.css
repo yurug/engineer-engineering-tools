@@ -1,0 +1,1834 @@
+/* backbrief UI — "the brief" (ADR-007, kb/conventions/visual-design.md).
+ *
+ * Design stance: a crisp document, not a dashboard. Neutral ink on cool
+ * paper; an editorial serif carries the voice (prose, focus headlines,
+ * choices), mono carries the skeleton (labels, citations, data, code) --
+ * there is NO default sans anywhere in this file, by rule.
+ *
+ * Non-negotiable (visual-design.md #1): colour is reserved ENTIRELY for
+ * proof status -- `--proven`/`--trusted`/`--contested` (+ their `-bg`/
+ * `-border` soft variants) are the ONLY hue-bearing tokens this file
+ * defines. Every other token (`--paper`/`--card`/`--ink`/`--ink-2`/
+ * `--faint`/`--rule`/`--rule-2`) is a neutral grey -- interactive states
+ * (hover, active, selected, primary action) invert paper/ink against each
+ * other, they never reach for a brand accent. A reviewer who sees colour
+ * anywhere in this app must be able to name the proof state it encodes;
+ * test/theme.test.ts greps this file for exactly that property.
+ *
+ * Light + dark are token-swapped (`@media (prefers-color-scheme)` AND a
+ * `[data-theme]` override so a future manual toggle wins both ways,
+ * visual-design.md's own requirement); components read tokens only, never
+ * raw hex. */
+
+:root {
+  /* Neutrals -- document paper/ink, not brand grey. */
+  --paper: #f6f5f2;
+  --card: #fbfaf8;
+  --ink: #1e2024;
+  --ink-2: #5f636a;
+  --faint: #9a9ea3;
+  --rule: #e2e1db;
+  --rule-2: #cdccc5;
+
+  /* The ONLY colour in the app -- proof status (P1 citation grounding AND
+     the MasteryState overlay both ARE proof-status signals; every usage
+     below traces to one of the two). */
+  --proven: #2f7d54;
+  --proven-bg: #e5f0e9;
+  --proven-border: #a9dcc6;
+  --trusted: #9c6f18;
+  --trusted-bg: #f2e9d5;
+  --trusted-border: #ecd39a;
+  --contested: #b04333;
+  --contested-bg: #f3e0db;
+  --contested-border: #edbac2;
+
+  --radius: 6px;
+  --radius-sm: 4px;
+  --radius-pill: 999px;
+  --serif: "Charter", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  --mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  /* A hard-edge, document-style shadow (mockup's own `.gloss`), not a soft
+     dashboard blur -- reinforces the "paper" metaphor. */
+  --shadow: 3px 4px 0 rgba(30, 32, 36, 0.08);
+  --header-h: 3rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #16171a;
+    --card: #1c1e22;
+    --ink: #e7e7e3;
+    --ink-2: #a4a8ad;
+    --faint: #6b6f75;
+    --rule: #2a2c31;
+    --rule-2: #3a3d43;
+    --proven: #64bb8b;
+    --proven-bg: #15291e;
+    --proven-border: #2f5546;
+    --trusted: #cf9f4c;
+    --trusted-bg: #2c2311;
+    --trusted-border: #574a2c;
+    --contested: #db7c6d;
+    --contested-bg: #2f1d19;
+    --contested-border: #5a3038;
+    --shadow: 3px 4px 0 rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Manual override hook (a theme toggle) -- wins over prefers-color-scheme
+ * in BOTH directions, visual-design.md's explicit requirement. */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --paper: #f6f5f2;
+  --card: #fbfaf8;
+  --ink: #1e2024;
+  --ink-2: #5f636a;
+  --faint: #9a9ea3;
+  --rule: #e2e1db;
+  --rule-2: #cdccc5;
+  --proven: #2f7d54;
+  --proven-bg: #e5f0e9;
+  --proven-border: #a9dcc6;
+  --trusted: #9c6f18;
+  --trusted-bg: #f2e9d5;
+  --trusted-border: #ecd39a;
+  --contested: #b04333;
+  --contested-bg: #f3e0db;
+  --contested-border: #edbac2;
+  --shadow: 3px 4px 0 rgba(30, 32, 36, 0.08);
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #16171a;
+  --card: #1c1e22;
+  --ink: #e7e7e3;
+  --ink-2: #a4a8ad;
+  --faint: #6b6f75;
+  --rule: #2a2c31;
+  --rule-2: #3a3d43;
+  --proven: #64bb8b;
+  --proven-bg: #15291e;
+  --proven-border: #2f5546;
+  --trusted: #cf9f4c;
+  --trusted-bg: #2c2311;
+  --trusted-border: #574a2c;
+  --contested: #db7c6d;
+  --contested-bg: #2f1d19;
+  --contested-border: #5a3038;
+  --shadow: 3px 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 15.5px;
+  line-height: 1.55;
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Neutral ink underline, never a coloured link -- visual-design.md #1. */
+a {
+  color: var(--ink);
+  text-decoration-line: underline;
+  text-decoration-color: var(--rule-2);
+  text-underline-offset: 2px;
+}
+a:hover {
+  text-decoration-color: var(--ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+  border-radius: var(--radius-sm);
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Visually hidden but still announced by a screen reader -- e.g. the "new
+ * activity" text that accompanies `.act-new-dot`'s purely decorative dot. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Controls: one consistent button + field language -------------------
+ * Buttons read as CHOICES (serif, the "voice" face, visual-design.md #5) --
+ * hover/active INVERT to solid ink, exactly like a brief's tactics (`.tac`
+ * in the mockup); there is no coloured button anywhere. `.btn-primary` is
+ * the ink-solid-always look for the one deliberate primary action on a
+ * screen (Send answer, Accept, Continue) -- applied explicitly, never
+ * inferred from `type="submit"` (this codebase mixes button types for
+ * unrelated reasons, e.g. keeping Enter from submitting a textarea). ---- */
+
+button {
+  font-family: var(--serif);
+  font-size: 13.5px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-sm);
+  padding: 0.32rem 0.75rem;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    border-color 0.12s ease;
+}
+button:hover:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+button:active:not(:disabled) {
+  background: var(--ink);
+  color: var(--paper);
+}
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+button.btn-primary {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+button.btn-primary:hover:not(:disabled) {
+  background: var(--ink-2);
+  border-color: var(--ink-2);
+}
+
+input,
+textarea,
+select {
+  font: inherit;
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--rule-2);
+  border-radius: var(--radius-sm);
+  padding: 0.35rem 0.5rem;
+}
+input:focus,
+textarea:focus,
+select:focus {
+  outline: 2px solid var(--ink);
+  outline-offset: -1px;
+  border-color: transparent;
+}
+textarea {
+  resize: vertical;
+  min-height: 2.2rem;
+  line-height: 1.5;
+}
+/* Fields that hold a path, a query, or a citation read as machine input. */
+.search-box input {
+  font-family: var(--mono);
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.3;
+}
+h3 {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* ---- App shell ---------------------------------------------------------- */
+
+/* Full-height, non-page-scrolling shell -- `.topbar` is fixed-height, each
+ * `.view` (tab panel, below) scrolls on its own axis. */
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.app-error {
+  max-width: 30rem;
+  margin: 4rem auto;
+  padding: 1.25rem;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--contested);
+  border-radius: var(--radius);
+}
+
+/* ---- Tab shell (Session/Map/Code) --------------------------------------- */
+/* ADR-005 decision 3 / kb/plan.md step 3, retoned for ADR-007's "the brief"
+ * identity: the active tab is bold ink text with an ink underline -- no
+ * accent background, matching the brief's own `.head` running-head rule
+ * (a 2px ink border, mockup's `.head`). */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  height: var(--header-h);
+  padding: 0 0.9rem;
+  background: var(--card);
+  border-bottom: 1px solid var(--rule);
+}
+.topbar-title {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink);
+  white-space: nowrap;
+}
+.tabs {
+  display: flex;
+  gap: 0.2rem;
+}
+.tab {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.tab:hover {
+  color: var(--ink);
+  background: none;
+}
+.tab[aria-selected="true"] {
+  color: var(--ink);
+  border-bottom-color: var(--ink);
+}
+/* Rule 0 (pedagogy-engine.md): pending items are a badge, never a Session
+ * banner -- the ONLY place a pending count renders (lib/pending-badges.ts).
+ * Ink/paper is neutral, not "colour" under visual-design.md #1 -- a count
+ * pill carries no proof-status claim. */
+.tab-badge {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--ink);
+  color: var(--paper);
+  border-radius: var(--radius-pill);
+  padding: 0.05rem 0.4rem;
+}
+/* Honest presence (P5) is NOT a proof-status claim, so it stays strictly
+ * monochrome: present = a filled ink dot, away = an outlined (hollow) dot,
+ * paused = a dashed-ring dot -- the WORD carries the meaning ("agent
+ * present"/"agent away"/"fixing — session paused"), the mark is a neutral
+ * affordance, never a red/green traffic light. */
+.presence-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 0.22rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--card);
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  white-space: nowrap;
+  margin-left: auto;
+}
+.presence-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex: none;
+  border: 1.4px solid var(--ink-2);
+  background: none;
+}
+.presence-present .presence-dot {
+  background: var(--ink);
+  border-color: var(--ink);
+}
+.presence-away .presence-dot {
+  background: none;
+  border-color: var(--faint);
+}
+.presence-paused .presence-dot {
+  background: none;
+  border-style: dashed;
+  border-color: var(--ink-2);
+}
+
+/* Honest awaiting-agent indicator (P5, 2026-07-19 dogfood: a clicked
+ * tactic/Continue/response felt dead while the agent composed its reply)
+ * -- components/AwaitingAgentStatus.tsx. Same monochrome discipline as
+ * .presence-chip above: "awaiting a reply" is not a proof-status claim, so
+ * no colour, ever (visual-design.md #1). The dot ANIMATES only in the
+ * "working" state -- that is the one moment this component is claiming
+ * real, live activity; "queued" (away) gets a STATIC hollow dot, because
+ * animating it would itself be a false liveness claim (P5). `prefers-
+ * reduced-motion: reduce` removes the pulse in every state, leaving the
+ * text as the only signal (visual-design.md's quality floor). */
+.awaiting-agent {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  margin: 6px 0 0;
+}
+.awaiting-agent-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  flex: none;
+  border: 1.4px solid var(--ink-2);
+  background: none;
+}
+.awaiting-agent-working .awaiting-agent-dot {
+  background: var(--ink);
+  border-color: var(--ink);
+  animation: awaiting-agent-pulse 1.4s ease-in-out infinite;
+}
+.awaiting-agent-queued .awaiting-agent-dot {
+  background: none;
+  border-color: var(--faint);
+}
+@keyframes awaiting-agent-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .awaiting-agent-working .awaiting-agent-dot {
+    animation: none;
+  }
+}
+
+/* Each tab panel stays MOUNTED, hidden via the `hidden` attribute (App.tsx's
+ * own header: never an unmount/remount, so Code's open file and Map's
+ * expanded regions survive a tab switch). */
+.view[hidden] {
+  display: none;
+}
+.view {
+  padding: 1.1rem;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.repo-moved-banner,
+.no-kb-mode-notice {
+  margin: 0.9rem 0.9rem 0;
+}
+
+/* ---- Banners / notices --------------------------------------------------
+ * `.repo-moved-banner` is a citation-revalidation event -- a genuine
+ * proof-status signal (visible citations are re-checking), so it earns
+ * `--trusted` (things are being re-confirmed, not yet re-settled). The
+ * no-KB-mode notice is a structural capability notice, NOT a proof-status
+ * claim -- it stays strictly ink/rule, no colour (visual-design.md #1). */
+
+.repo-moved-banner,
+.no-kb-mode-notice {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: var(--radius);
+  padding: 0.55rem 0.8rem;
+  margin: 0.9rem 0 0;
+  font-size: 13px;
+}
+.repo-moved-banner {
+  background: var(--trusted-bg);
+  color: var(--trusted);
+  border: 1px solid var(--trusted-border);
+}
+.no-kb-mode-notice {
+  background: var(--card);
+  color: var(--ink-2);
+  border: 1px solid var(--rule-2);
+}
+.repo-moved-banner button {
+  background: transparent;
+  border-color: currentColor;
+  color: inherit;
+}
+
+/* ---- Citations: the product's colour language (P1) ----------------------
+ * The canonical proof-status mapping: valid=proven, drifted=trusted (still
+ * usable, re-verifying), broken=contested. Every OTHER colour usage in this
+ * file traces back to this same three-way state, directly or by analogy
+ * (MasteryState, below). */
+
+.citation-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0.5rem 0 0;
+}
+.citation-badge {
+  font-size: 11px;
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  border: 1px solid transparent;
+  cursor: default;
+}
+.citation-valid {
+  background: var(--proven-bg);
+  color: var(--proven);
+  border-color: var(--proven-border);
+}
+.citation-drifted {
+  background: var(--trusted-bg);
+  color: var(--trusted);
+  border-color: var(--trusted-border);
+}
+.citation-broken {
+  background: var(--contested-bg);
+  color: var(--contested);
+  border-color: var(--contested-border);
+  border-style: dashed;
+}
+
+/* R7-3: "citations render as file:line links (-> Code)" -- `.citation-link`
+ * is an additive modifier (CitationStrip.tsx, MapNodeCard.tsx, MoveBrief.tsx's
+ * evidence list all apply it alongside `.citation-badge`/`.map-node-card-cite`
+ * whenever a caller wires navigation) so the proof-status colour NEVER
+ * changes meaning -- only the cursor/underline signal "this is a link" on
+ * top of it. Hover still inverts to solid ink like every other interactive
+ * control here (button's own base rule); that is the SAME transient
+ * affordance `.brief-tactic:hover` uses, not a new colour claim. */
+.citation-link {
+  cursor: pointer;
+}
+.citation-link:hover:not(:disabled),
+.citation-link:focus-visible {
+  text-decoration: underline;
+}
+
+/* File tree */
+.virtual-list {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  background: var(--paper);
+}
+.tree-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0.15rem 0.4rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tree-row:hover:not(:disabled) {
+  background: var(--rule);
+}
+.tree-row-selected,
+.tree-row-selected:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+.tree-row-icon {
+  color: var(--faint);
+  flex: none;
+}
+
+/* Code viewer (CodeMirror mounts inside) */
+/* FIX 3 (dogfood 2026-07-13, original context: the retired Canvas.tsx):
+ * this used to force height:100%+overflow:auto, giving CM6 its OWN
+ * scrollbar nested inside an ancestor's own -- a card docked below the
+ * editor was invisible while scrolling INSIDE the code.
+ * @codemirror/view's baseTheme only sets `.cm-scroller{overflow-x:auto}`
+ * (horizontal) by default; the old vertical scroll came entirely from
+ * THESE two rules, not from CM6 itself (kb/external/codemirror6.md), so
+ * removing them is enough: `.cm-editor`/`.cm-scroller` now size to their
+ * content and the caller's own scroll container (step 3:
+ * `.code-activity-scroll`, CodeActivity.tsx) is the ONE scroll region --
+ * code AND the inline callout/annotation widgets (lib/callout-widgets.ts)
+ * mounted inside it. */
+.code-viewer {
+  font-size: 12px;
+}
+.code-viewer .cm-scroller {
+  font-family: var(--mono);
+}
+
+/* An agent callout or human annotation mounted INLINE as a CM6 block
+ * widget, right after the code lines it's about (lib/callout-widgets.ts).
+ * Reuses `.callout`/`.annot`'s colours below (both classes are set on this
+ * same element) but overrides their trailing-block margin: no gutter-width
+ * indent is needed here -- a CM6 block widget's row already excludes the
+ * line-number gutter (`.cm-gutters` is a separate column), so it lines up
+ * under the code's CONTENT automatically. */
+.cm-callout-widget {
+  margin: 0.5rem 0.6rem 0.7rem;
+  max-width: 44rem;
+}
+
+/* ---- KB viewer ---------------------------------------------------------- */
+
+.kb-viewer {
+  padding: 0.5rem 0.9rem;
+  overflow: auto;
+  height: 100%;
+}
+.kb-frontmatter {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.65rem;
+  margin-bottom: 0.75rem;
+  color: var(--ink-2);
+}
+.kb-body {
+  max-width: 44rem;
+}
+.kb-body pre {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 0.7rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+}
+.kb-body code {
+  font-family: var(--mono);
+}
+
+/* ---- Search ------------------------------------------------------------- */
+
+.search-box {
+  display: flex;
+  gap: 0.4rem;
+}
+.search-box input {
+  flex: 1;
+}
+.search-status {
+  color: var(--ink-2);
+  font-size: 11px;
+}
+.search-results {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-height: 40vh;
+  overflow: auto;
+}
+.search-result-path {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink);
+  text-decoration: underline dotted var(--rule-2);
+}
+.search-result-text {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* `.callout`/`.annot` stay defined for lib/callout-widgets.ts's CM6 inline
+ * widgets (CodeViewer.tsx's `calloutWidgets` prop) -- the pipeline itself
+ * is still live and tested even though no current caller populates it with
+ * real specs (Canvas.tsx, the only caller that did, is retired -- kb/plan.md
+ * step 3). An agent callout is a neutral attribution (ink), not a proof
+ * claim; a human annotation is a note AWAITING the agent's reaction, which
+ * fits `--trusted` (open, not yet resolved) rather than decoration. */
+.callout,
+.annot {
+  margin: 0.6rem 0.9rem 0.9rem 3.8rem;
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  max-width: 44rem;
+}
+.callout {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--ink);
+  box-shadow: var(--shadow);
+}
+.callout .who {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  margin-bottom: 0.25rem;
+}
+.annot {
+  background: var(--trusted-bg);
+  border: 1px solid var(--trusted-border);
+  font-size: 12px;
+}
+.annot .scope {
+  float: right;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--trusted);
+}
+.annot .who {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--trusted);
+}
+
+/* The clickable citation chip inside a canvas block -- CitationStrip's own
+ * badges stay non-interactive (used elsewhere unchanged); this is the
+ * canvas-only "re-scroll on click" affordance. */
+.cite-row {
+  margin-top: 0.5rem;
+}
+.cite {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--rule);
+}
+.cite::before {
+  content: "↳";
+}
+.cite.citation-valid {
+  border-color: var(--proven-border);
+  background: var(--proven-bg);
+  color: var(--proven);
+}
+.cite.citation-drifted {
+  border-color: var(--trusted-border);
+  background: var(--trusted-bg);
+  color: var(--trusted);
+}
+.cite.citation-broken {
+  border-color: var(--contested-border);
+  background: var(--contested-bg);
+  color: var(--contested);
+}
+
+.block-menu-action,
+.block-followup {
+  margin-top: 0.5rem;
+}
+.block-followup {
+  display: flex;
+  gap: 0.4rem;
+}
+.block-followup textarea {
+  flex: 1;
+}
+.block-menu-list {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+/* ---- SelectionContextMenu (Code activity's region-scoped action popover,
+ * floating next to the selection -- 2026-07-19 dogfood fix, see the
+ * component's own header for why this replaced a docked-at-the-bottom
+ * toolbar). `position`/`top`/`left` are set inline by the component
+ * (lib/popover-position.ts's placement, same "computed style, static
+ * class" split as .kbref-hovercard/.glossary-hovercard) -- this rule only
+ * carries the visual chrome. */
+
+.selection-menu {
+  z-index: 20;
+  max-width: 26rem;
+  background: var(--card);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.7rem;
+  box-shadow: var(--shadow);
+}
+.selection-menu-scope {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--faint);
+  margin-bottom: 0.4rem;
+}
+.selection-menu-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.selection-menu-close {
+  margin-left: auto;
+  border: none;
+  background: none;
+  color: var(--faint);
+}
+.selection-menu-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.selection-menu-form-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+.selection-menu-error {
+  color: var(--contested);
+  font-size: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ---- Round 7 (ADR-007): "the brief" -- the Session activity's shell ------
+ * kb/spec/interaction-model.md's three parts (Established / This brief /
+ * Where next), styled per kb/conventions/visual-design.md and matching
+ * docs/design/rethink-mockup-round7-2026-07-19.html's structure. Mounted by
+ * App.tsx's Session tab (components/Brief.tsx); MoveBrief/TalkBrief/
+ * RuptureBrief supply "This brief"'s body per content kind (kb/plan.md
+ * R7-2's named unknown: one shell, no per-kind layout special-casing). ---- */
+
+.brief {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+.brief-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding-bottom: 9px;
+  border-bottom: 2px solid var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.brief-head-b {
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+.brief-head-repo {
+  color: var(--ink-2);
+}
+.brief-head-r {
+  margin-left: auto;
+  color: var(--ink-2);
+}
+
+.brief-block {
+  margin-top: 26px;
+}
+.brief-tag {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin: 0 0 9px;
+}
+
+/* Established -- ✓ items derived from the overlay (grasped/demonstrated
+ * nodes), never a new protocol (interaction-model.md#the-brief). The
+ * checkmark is `--proven` -- a legitimate proof-status use: it names
+ * exactly the state (demonstrated/grasped) each item represents. */
+.brief-established {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.brief-est-item {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink);
+  padding: 3px 10px 3px 8px;
+  border: 1px solid var(--rule-2);
+  border-radius: 3px;
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+}
+.brief-est-item::before {
+  content: "✓";
+  color: var(--proven);
+  font-weight: 700;
+}
+.brief-est-none {
+  font-style: italic;
+  color: var(--ink-2);
+  font-size: 14.5px;
+}
+
+/* This brief -- headline + plain intent (US11/US13, always visible). */
+.brief-focus {
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1.26;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px;
+}
+.brief-intent {
+  font-size: 15px;
+  color: var(--ink-2);
+  margin: 0;
+  max-width: 60ch;
+}
+.brief-body {
+  margin-top: 14px;
+}
+
+/* Where next -- tactics (one-line choices, hover-inverts-to-ink per
+ * visual-design.md's exact wording) + the free textbox. No colour: the
+ * ONLY visual state is the ink/paper invert every interactive control in
+ * this file already uses. */
+.brief-next {
+  margin-top: 8px;
+}
+.brief-tactics {
+  border-top: 1px solid var(--rule);
+}
+.brief-tactic {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  font-family: var(--serif);
+  font-size: 16.5px;
+  color: var(--ink);
+  background: none;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  padding: 11px 8px 11px 2px;
+  cursor: pointer;
+}
+.brief-tactic:hover:not(:disabled),
+.brief-tactic:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+  padding-left: 12px;
+}
+.brief-tactic-arrow {
+  color: var(--faint);
+  flex: none;
+}
+.brief-tactic:hover .brief-tactic-arrow,
+.brief-tactic:focus-visible .brief-tactic-arrow {
+  color: var(--paper);
+}
+.brief-tactic-hint {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--faint);
+}
+.brief-tactic:hover .brief-tactic-hint,
+.brief-tactic:focus-visible .brief-tactic-hint {
+  color: var(--rule-2);
+}
+
+.brief-own {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 15px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--faint);
+}
+.brief-own input {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  background: none;
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--ink);
+  padding: 7px 2px;
+}
+.brief-own input::placeholder {
+  color: var(--faint);
+}
+.brief-own input:focus {
+  outline: none;
+  border-bottom-color: var(--ink);
+}
+
+/* A proven-line device / figure mounted inside "This brief" (DeviceCard.tsx
+ * and friends still supply the CONTENT; these are just the frame). */
+.brief-fig {
+  border: 1px solid var(--rule);
+  background: var(--card);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin: 14px 0 10px;
+}
+
+/* MoveBrief -- the move loop's quick responses + answer box, now rendered
+ * as "This brief"'s body (SessionMove.tsx retired, kb/plan.md R7-2: "the
+ * old move quick-buttons still apply WITHIN a move"). */
+.move-brief-say {
+  color: var(--ink);
+  font-size: 15.5px;
+  margin: 0 0 8px;
+}
+.move-brief-ask {
+  font-weight: 600;
+  font-size: 15.5px;
+  margin: 0 0 12px;
+}
+.move-brief-answer {
+  display: flex;
+  gap: 0.4rem;
+  align-items: flex-start;
+  margin: 0.6rem 0;
+}
+.move-brief-answer textarea {
+  flex: 1;
+}
+.move-brief-responses {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.move-brief-response-active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+.move-brief-evidence {
+  margin: 0.5rem 0 0;
+  padding-left: 1.2rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+/* TalkBrief -- the full talk view (R7-3, kb/plan.md): progress steps,
+ * device/say/caption (shared with MoveBrief's own `.move-brief-say`), the
+ * question/answer thread, and the continue/ask/exit action row. Visual
+ * reference: docs/design/rethink-mockup-round7-2026-07-19.html's
+ * `.steps`/`.stp`/`.talkact`. */
+.talk-brief-caption {
+  color: var(--ink-2);
+  font-size: 14px;
+  margin: 8px 0 0;
+}
+
+/* Progress -- neutral (ink/faint/rule) by design: a slide's position in the
+ * talk is not a proof-status claim, so `done`/`here` differ only in weight
+ * and fill, never in hue (visual-design.md #1). */
+.talk-progress {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 7px;
+  list-style: none;
+  margin: 0 0 14px;
+  padding: 0;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--faint);
+}
+.talk-step {
+  display: flex;
+  align-items: center;
+}
+.talk-step-marker {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--rule-2);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 9.5px;
+}
+.talk-step-done {
+  color: var(--ink-2);
+}
+.talk-step-done .talk-step-marker {
+  border-color: var(--ink-2);
+}
+.talk-step-here {
+  color: var(--ink);
+  font-weight: 700;
+}
+.talk-step-here .talk-step-marker {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+/* The question/answer thread for the CURRENT slide (lib/talk-fold.ts's
+ * `talkSlideThread`) -- a plain list, no card chrome, since it is a
+ * transient side-conversation, not a new content kind of its own. */
+.talk-brief-thread {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.talk-brief-thread-item p {
+  margin: 0;
+  font-size: 13.5px;
+}
+.talk-brief-thread-who {
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--faint);
+  margin-right: 4px;
+}
+.talk-brief-thread-waiting {
+  font-style: italic;
+  color: var(--faint);
+}
+
+/* Continue / ask / leave -- ONE primary action (Continue) plus the free
+ * "ask about this step" field, matching visual-design.md #4. `Continue`
+ * disables while `isTalkPaused` is true -- the pause status text (`.p`) is
+ * the ONLY thing that changes to explain why. */
+.talkact {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+}
+.talkact-ask {
+  flex: 1;
+  min-width: 180px;
+}
+.talkact-ask input {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  background: none;
+  font-style: italic;
+  padding: 7px 2px;
+}
+.talkact-ask input:focus {
+  outline: none;
+  border-bottom-color: var(--ink);
+}
+.talkact-p {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--faint);
+  white-space: nowrap;
+}
+
+/* RuptureBrief -- the pause-for-change lifecycle's two moments (proposal
+ * awaiting accept/later, then paused-and-fixing), pedagogy-engine.md#rupture.
+ * A rupture is fundamentally a CONTESTED finding being repaired -- the
+ * `--contested` tint is a legitimate proof-status use, not decoration. */
+.rupture-brief-plan {
+  color: var(--ink);
+  font-size: 15px;
+  background: var(--contested-bg);
+  border: 1px solid var(--contested-border);
+  border-radius: var(--radius);
+  padding: 0.7rem 0.85rem;
+  margin: 0 0 10px;
+}
+.rupture-brief-sent {
+  color: var(--ink-2);
+  font-size: 14px;
+}
+
+.device-card {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 0.5rem 0.7rem;
+  margin: 0.5rem 0;
+  background: var(--card);
+}
+.device-law-statement {
+  white-space: pre-wrap;
+  font-family: var(--mono);
+  margin: 0 0 0.3rem;
+}
+.device-law-reading {
+  color: var(--ink-2);
+  margin: 0;
+}
+.device-scenario-strip h4 {
+  margin: 0.3rem 0 0.2rem;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+.device-scenario-tokens {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.device-token {
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 0.1rem 0.4rem;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.device-token-torn {
+  border-color: var(--trusted-border);
+  background: var(--trusted-bg);
+  color: var(--trusted);
+}
+.device-token-gone {
+  border-color: var(--contested-border);
+  background: var(--contested-bg);
+  color: var(--contested);
+  text-decoration: line-through;
+}
+
+/* ---- Step-2 dynamic/composite devices: trace, state-machine, memory ---- */
+/* Per-element flagging reuses .citation-valid/-drifted/-broken (above)
+   directly as a modifier class -- one color language for "is this
+   grounded" everywhere, never a second one invented per device kind. */
+
+.device-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.device-stepper-forward {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.device-trace-input {
+  font-family: var(--mono);
+  color: var(--ink-2);
+  margin: 0 0 0.3rem;
+}
+.device-trace-frame {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.6rem;
+}
+.device-trace-position {
+  font-size: 11px;
+  color: var(--ink-2);
+}
+.device-trace-say {
+  margin: 0.2rem 0 0;
+}
+
+.device-state-machine-states {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+.device-state {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.5rem;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.device-state-current {
+  font-weight: 600;
+  box-shadow: 0 0 0 2px var(--ink);
+}
+.device-state-machine-transitions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.device-transition {
+  text-align: left;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.2rem 0.5rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  background: var(--card);
+}
+.device-transition:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.device-memory-note {
+  color: var(--ink-2);
+  font-size: 12px;
+  margin: 0 0 0.3rem;
+}
+.device-memory-cells {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+.device-memory-cell {
+  display: flex;
+  gap: 0.3rem;
+  align-items: baseline;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.4rem;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.device-memory-key {
+  font-weight: 600;
+}
+.device-memory-ttl {
+  color: var(--ink-2);
+  font-size: 10px;
+}
+.device-memory-empty {
+  color: var(--ink-2);
+  font-size: 12px;
+  margin: 0;
+}
+
+.map-node-state {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  border: 1px solid var(--rule);
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+.map-node-state-grasped,
+.map-node-state-demonstrated {
+  border-color: var(--proven-border);
+  background: var(--proven-bg);
+  color: var(--proven);
+}
+.map-node-state-shaky,
+.map-node-state-introduced {
+  border-color: var(--trusted-border);
+  background: var(--trusted-bg);
+  color: var(--trusted);
+}
+.map-node-state-contested,
+.map-node-state-invalidated {
+  border-color: var(--contested-border);
+  background: var(--contested-bg);
+  color: var(--contested);
+}
+
+/* ---- Map activity: dagre-laid comprehension graph + node card ----------- */
+/* kb/plan.md step 3. Positions come from lib/map-layout.ts's @dagrejs/dagre
+ * call (kb/external/dagre-layout.md: "Position React components directly
+ * using g.node(id).x/.y ... absolute-positioned divs"), NOT from Mermaid/
+ * SVG layout -- `.map-node` is an absolutely-positioned <button>, `.map-edges`
+ * is a same-sized <svg> overlay drawing `requires` lines underneath them.
+ * kb/plan.md R7-2's readability fix: NODE_WIDTH/HEIGHT (lib/map-layout.ts)
+ * grew from 170x58 to 190x74 and the label clamp from 3 to 4 lines -- a
+ * P13 question is <=12 words, and the old box truncated a normal-length one
+ * mid-sentence with no way to read the rest short of opening the node card. */
+
+.map-view {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+.map-scroll {
+  overflow: auto;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 1rem;
+}
+.map-canvas {
+  position: relative;
+}
+.map-edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.map-edge {
+  stroke: var(--rule-2);
+  stroke-width: 1.4;
+}
+
+.map-node {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+  font-family: var(--serif);
+  border: 1.5px solid var(--rule-2);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 0.4rem 0.6rem;
+  font-size: 12.5px;
+  line-height: 1.3;
+  overflow: hidden;
+}
+.map-node-tag {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.map-node-label {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.map-node-selected {
+  border-width: 2px;
+  box-shadow: 0 0 0 3px var(--rule-2);
+}
+.map-node-region {
+  border-style: dashed;
+  background: var(--paper);
+}
+
+/* Mastery-state colour language -- reuses `.map-node-state-*`'s own colour
+ * assignments above (SAME semantics, one vocabulary across the list-era
+ * badge and the graph node) plus two graph-only POSITIONAL states
+ * (`in-play`, `frontier`) that carry no proof claim of their own, so they
+ * stay ink/neutral rather than borrowing a proof-status colour they don't mean. */
+.map-node-demonstrated,
+.map-node-grasped {
+  background: var(--proven-bg);
+  border-color: var(--proven-border);
+}
+.map-node-demonstrated .map-node-tag,
+.map-node-grasped .map-node-tag {
+  color: var(--proven);
+}
+.map-node-in-play {
+  background: var(--card);
+  border-color: var(--ink);
+  border-width: 2px;
+  box-shadow: 0 0 0 3px var(--rule-2);
+}
+.map-node-in-play .map-node-tag {
+  color: var(--ink);
+}
+.map-node-frontier {
+  border-style: dashed;
+  color: var(--ink-2);
+}
+.map-node-shaky {
+  background: var(--trusted-bg);
+  border-color: var(--trusted-border);
+}
+.map-node-shaky .map-node-tag {
+  color: var(--trusted);
+}
+.map-node-contested,
+.map-node-invalidated {
+  border-style: dotted;
+  color: var(--faint);
+}
+.map-node-contested .map-node-tag,
+.map-node-invalidated .map-node-tag {
+  color: var(--contested);
+}
+
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.9rem;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-2);
+}
+.map-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.map-legend-swatch {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 3px;
+  display: inline-block;
+  border: 1.4px solid var(--rule-2);
+  background: var(--card);
+}
+
+/* Selected-node card (MapNodeCard.tsx) -- confirm/refine/contest wired to
+ * `node_response` (comprehension-map.md). Reuses `.map-node-state*`'s
+ * badge above (one small badge vocabulary, one definition).
+ * 2026-07-22 dogfood fix: floats as a `position: fixed` popover anchored
+ * to the clicked node (placePopover, mirroring `.selection-menu`'s own
+ * treatment below) instead of docking in-flow under the graph -- `z-index`
+ * and `box-shadow` are new for that reason, everything else is unchanged. */
+.map-node-card {
+  z-index: 20;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  background: var(--card);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 42rem;
+}
+.map-node-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.map-node-card-type {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--faint);
+}
+.map-node-card-close {
+  margin-left: auto;
+  border: none;
+  background: none;
+  color: var(--faint);
+}
+.map-node-card-history {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-2);
+  line-height: 1.7;
+}
+.map-node-card-cites {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+.map-node-card-cite {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 0.12rem 0.45rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--proven-border);
+  background: var(--proven-bg);
+  color: var(--proven);
+}
+.map-node-card-cite-stale {
+  border-color: var(--trusted-border);
+  background: var(--trusted-bg);
+  color: var(--trusted);
+}
+.map-node-card-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+.map-node-card-form {
+  display: flex;
+  gap: 0.4rem;
+}
+.map-node-card-form textarea {
+  flex: 1;
+}
+
+/* ---- Code activity: file tree + search + code/KB viewer ----------------- */
+/* kb/plan.md step 3 -- tree+main split (GitHub-style density, no permanent
+ * side-panel forms; SelectionContextMenu covers annotate/ask/understood/
+ * contest). */
+
+.code-activity {
+  display: grid;
+  grid-template-columns: minmax(170px, 15rem) minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+  height: 100%;
+}
+.code-activity-tree {
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.code-activity-main {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.code-activity-pathbar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--mono);
+  font-size: 12px;
+  padding: 0.45rem 0.1rem;
+}
+.code-activity-hint {
+  margin-left: auto;
+  color: var(--faint);
+  font-size: 11px;
+}
+.code-activity-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  background: var(--card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+}
+.code-activity-empty {
+  padding: 1.25rem;
+  color: var(--ink-2);
+  font-style: italic;
+}
+.code-activity-error {
+  padding: 0.6rem 0.75rem;
+  margin: 0.6rem;
+  border-radius: var(--radius-sm);
+  background: var(--contested-bg);
+  color: var(--contested);
+  border: 1px solid var(--contested-border);
+  font-size: 12px;
+}
+
+/* A "kb/....md[#anchor]" reference inside a comment (shared/kb-ref.ts,
+ * GET /api/file's `kbReferences`) -- styled exactly like a glossary term
+ * (visual-design.md: "Glossary terms get a dotted underline + hover card"),
+ * ink not colour; the hover card itself is a separate, plain React overlay
+ * (KbRefHoverCard.tsx), not a CM6 widget (CodeViewer.tsx's own delegated
+ * mouseover/mouseout). */
+.cm-kbref {
+  color: var(--ink);
+  text-decoration: underline dotted;
+  cursor: pointer;
+}
+
+.kbref-hovercard {
+  max-width: 30rem;
+  background: var(--card);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0.6rem 0.75rem;
+  font-size: 12.5px;
+  z-index: 20;
+}
+.kbref-hovercard-head {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-2);
+  margin-bottom: 0.3rem;
+}
+.kbref-hovercard-head b {
+  color: var(--ink);
+}
+.kbref-hovercard-summary {
+  margin: 0 0 0.4rem;
+}
+.kbref-hovercard-preview {
+  margin: 0;
+  padding: 0.4rem 0.5rem;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  font-family: var(--mono);
+  font-size: 11px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+.kbref-hovercard-error {
+  margin: 0;
+  color: var(--contested);
+}
+
+/* Glossary term cards (US15, R7-3) -- GlossaryText.tsx/GlossaryTermCard.tsx
+ * REUSE this exact pattern deliberately: `.glossary-term` mirrors `.cm-kbref`
+ * (dotted underline, ink not colour) and `.glossary-hovercard` mirrors
+ * `.kbref-hovercard` (fixed card, ink border, the same shadow token) --
+ * visual-design.md's own line names them as the SAME idiom ("Glossary terms
+ * get a dotted underline + hover card"), so the CSS stays one shared look
+ * rather than two near-identical ones. */
+.glossary-term {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+.glossary-hovercard {
+  max-width: 22rem;
+  background: var(--card);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0.6rem 0.75rem;
+  font-size: 12.5px;
+  z-index: 20;
+}
+.glossary-hovercard-head {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ink);
+  margin-bottom: 0.3rem;
+}
+.glossary-hovercard-def {
+  margin: 0 0 0.4rem;
+}
+.glossary-hovercard-link {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--ink-2);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.glossary-hovercard-link:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+/* Annotations inbox (ADR-007: "annotations get their own returnable inbox,
+ * never hijacking the current brief") -- a top-right toggled panel, NOT
+ * mounted inside the brief; App.tsx renders it as a sibling of the tab
+ * panels, not as content of any one of them. */
+.inbox-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.annotations-inbox {
+  position: fixed;
+  top: calc(var(--header-h) + 8px);
+  right: 12px;
+  width: 22rem;
+  max-height: 70vh;
+  overflow: auto;
+  background: var(--card);
+  border: 1px solid var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 0.7rem 0.85rem;
+  z-index: 30;
+}
+.annotations-inbox-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-2);
+  margin-bottom: 0.5rem;
+}
+.annotations-inbox-head button {
+  border: none;
+  background: none;
+  padding: 0 0.2rem;
+}
+.annotations-inbox-empty {
+  color: var(--ink-2);
+  font-size: 13px;
+}
+.annotations-inbox-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.annotations-inbox-item {
+  border-top: 1px solid var(--rule);
+  padding-top: 0.5rem;
+}
+.annotations-inbox-item-archived {
+  opacity: 0.55;
+}
+.annotations-inbox-text {
+  margin: 0.3rem 0 0;
+  font-size: 13px;
+}
+.annotations-inbox-reactions {
+  list-style: none;
+  margin: 0.4rem 0 0;
+  padding-left: 0.7rem;
+  border-left: 2px solid var(--rule-2);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.annotations-inbox-reactions li {
+  font-size: 12.5px;
+  color: var(--ink-2);
+}
