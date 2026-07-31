@@ -85,11 +85,17 @@ fi
 # --- report ------------------------------------------------------------------
 echo
 echo "installed:"
+BIN_DIR="$(npm prefix -g)/bin"
 for t in $TOOLS; do
-  if command -v "$t" >/dev/null 2>&1; then
-    printf '  %-11s %s\n' "$t" "$(command -v "$t")"
+  linked="$BIN_DIR/$t"
+  if [ -e "$linked" ]; then
+    if command -v "$t" >/dev/null 2>&1 && [ "$(command -v "$t")" = "$linked" ]; then
+      printf '  %-11s %s\n' "$t" "$linked"
+    else
+      printf '  %-11s %s -- add %s to PATH\n' "$t" "$linked" "$BIN_DIR"
+    fi
   else
-    printf '  %-11s NOT ON PATH -- check `npm config get prefix` is on your PATH\n' "$t"
+    printf '  %-11s LINK FAILED -- expected %s\n' "$t" "$linked"
   fi
 done
 
