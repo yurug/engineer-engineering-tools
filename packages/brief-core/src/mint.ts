@@ -11,7 +11,12 @@
 // minting re-resolves the same content and reports it "broken" in the
 // response the caller sees. A card with an ungroundable citation still
 // posts, visibly flagged, rather than the whole action being rejected.
-import { AppError, hashLines, type Citation, type CitationInput } from "@brief/shared";
+import {
+  AppError,
+  hashLines,
+  type Citation,
+  type CitationInput,
+} from "@brief/shared";
 import type { CitationRepoAccess } from "./content-access";
 
 /** Never a valid sha256 hex digest (odd length) -- guarantees mint never
@@ -57,7 +62,9 @@ export function makeCitationMinter(
     // content in the same request, so a fresh citation is always "valid" at
     // ingest. Drift/broken only surface LATER, on revalidation, when this
     // stored hash is compared against then-current content.
-    const contentHash = hashLines(lines.slice(input.startLine - 1, input.endLine));
+    const contentHash = hashLines(
+      lines.slice(input.startLine - 1, input.endLine),
+    );
     return {
       kind: "code",
       path: input.path,
@@ -92,7 +99,11 @@ export function assertMinted(citations: readonly CitationInput[]): Citation[] {
         },
       );
     }
-    return { ...citation, rev: citation.rev, contentHash: citation.contentHash };
+    return {
+      ...citation,
+      rev: citation.rev,
+      contentHash: citation.contentHash,
+    };
   });
 }
 

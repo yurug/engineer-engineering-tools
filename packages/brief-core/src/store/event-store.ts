@@ -52,7 +52,10 @@ export interface AppendResult {
 export class EventStore {
   private seq = 0;
   private readonly log: Envelope[] = [];
-  private readonly clientKeyIndex = new Map<string, { id: string; seq: number }>();
+  private readonly clientKeyIndex = new Map<
+    string,
+    { id: string; seq: number }
+  >();
   private readonly subscribers = new Set<(envelope: Envelope) => void>();
   private fileHandle: FileHandle | null = null;
   private writeQueue: Promise<unknown> = Promise.resolve();
@@ -95,7 +98,10 @@ export class EventStore {
     this.log.push(envelope);
     this.seq = Math.max(this.seq, envelope.seq);
     if (envelope.clientKey)
-      this.clientKeyIndex.set(envelope.clientKey, { id: envelope.id, seq: envelope.seq });
+      this.clientKeyIndex.set(envelope.clientKey, {
+        id: envelope.id,
+        seq: envelope.seq,
+      });
   }
 
   private async rewriteNormalized(
@@ -184,7 +190,9 @@ function assertReadable(envelope: Envelope): void {
   if (parsed.success) return;
   const first = parsed.error.issues[0];
   const at = first ? first.path.map(String).join(".") : "";
-  const detail = first ? `${at === "" ? "" : at + ": "}${first.message}` : "schema rejected it";
+  const detail = first
+    ? `${at === "" ? "" : at + ": "}${first.message}`
+    : "schema rejected it";
   // The id hint is conditional on purpose: a blanket "check your id generator"
   // is actively misleading when the offending field is a citation hash, which
   // is what the first run of this check actually surfaced.

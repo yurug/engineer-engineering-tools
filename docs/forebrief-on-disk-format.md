@@ -21,8 +21,7 @@ decisions into `kb/` is a separate, agent-authored, lint-gated commit.
 The nested `.forebrief/.gitignore` is written by `serve` on first run and covers the runtime
 files above.
 
-The full schema, including the fold-in formats, is in
-[`kb/spec/config-and-formats.md`](../kb/spec/config-and-formats.md).
+The tables and descriptions in this page are the public reference for these files.
 
 ## Why the log is tracked
 

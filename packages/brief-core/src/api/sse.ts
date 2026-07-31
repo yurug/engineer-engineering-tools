@@ -43,8 +43,12 @@ export function followEventsRoute(deps: FollowRouteDeps) {
       // sending can be lost.
       const backlog = deps.eventStore.readSince(since);
       const emitter = new EventEmitter();
-      const unsubscribe = deps.eventStore.subscribe((envelope) => emitter.emit("item", envelope));
-      const liveEvents = on(emitter, "item", { signal: abortController.signal });
+      const unsubscribe = deps.eventStore.subscribe((envelope) =>
+        emitter.emit("item", envelope),
+      );
+      const liveEvents = on(emitter, "item", {
+        signal: abortController.signal,
+      });
       const heartbeat = setInterval(() => {
         deps.presence.markSeen(actor);
         emitter.emit("item", null); // null = heartbeat tick, no envelope
@@ -72,7 +76,8 @@ async function pumpUntilAborted(
 ): Promise<void> {
   try {
     for await (const [item] of liveEvents) {
-      if (item === null) await stream.writeSSE({ event: "heartbeat", data: "" });
+      if (item === null)
+        await stream.writeSSE({ event: "heartbeat", data: "" });
       else await writeEnvelope(stream, item as Envelope);
     }
   } catch (error) {
@@ -82,7 +87,10 @@ async function pumpUntilAborted(
   }
 }
 
-async function writeEnvelope(stream: SSEStreamingApi, envelope: Envelope): Promise<void> {
+async function writeEnvelope(
+  stream: SSEStreamingApi,
+  envelope: Envelope,
+): Promise<void> {
   await stream.writeSSE({ event: "envelope", data: JSON.stringify(envelope) });
 }
 

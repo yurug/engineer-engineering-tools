@@ -15,7 +15,9 @@ import { CitationSchema, type Citation } from "./citation";
 export type Actor = "agent" | "human" | "system";
 
 /** Crockford base32, 26 chars -- the ULID shape (config-and-formats.md#ids). */
-export const UlidSchema = z.string().regex(/^[0-9A-HJKMNP-TV-Z]{26}$/i, "must be a ULID");
+export const UlidSchema = z
+  .string()
+  .regex(/^[0-9A-HJKMNP-TV-Z]{26}$/i, "must be a ULID");
 
 /**
  * The unit every action and event becomes once the server has assigned it

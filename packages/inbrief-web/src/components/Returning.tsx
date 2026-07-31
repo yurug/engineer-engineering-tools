@@ -22,11 +22,13 @@ const HELD: readonly Mastery[] = ["grasped", "demonstrated"];
 export interface ReturningProps {
   nodes: GroundedNode[];
   mastery: Record<string, Mastery>;
+  revised: string[];
   /** True when the project carries material, whatever the record says. */
   hasMaterial: boolean;
   /** Jumps to a node whose ground has moved. */
   onRevisit: (id: string) => void;
   onContinue: () => void;
+  onEnd: () => void;
 }
 
 /** @returns held nodes whose citations no longer all resolve. */
@@ -40,12 +42,17 @@ export function rotted(nodes: GroundedNode[], mastery: Record<string, Mastery>):
 export function Returning({
   nodes,
   mastery,
+  revised,
   hasMaterial,
   onRevisit,
   onContinue,
+  onEnd,
 }: ReturningProps): React.JSX.Element {
   const held = nodes.filter((n) => HELD.includes(mastery[n.id] ?? "unseen"));
   const moved = rotted(nodes, mastery);
+  const changed = nodes.filter(
+    (n) => revised.includes(n.id) && HELD.includes(mastery[n.id] ?? "unseen"),
+  );
   const fresh = nodes.filter((n) => (mastery[n.id] ?? "unseen") === "unseen");
 
   return (
@@ -74,11 +81,30 @@ export function Returning({
         </section>
       )}
 
+      {changed.length > 0 && (
+        <section className="rotted">
+          <h2>These claims changed since you reviewed them</h2>
+          <p className="note">
+            Your mastery was not changed for you. Review the revised claim and decide whether it
+            still stands.
+          </p>
+          <ul data-testid="revised">
+            {changed.map((n) => (
+              <li key={n.id}>
+                <button type="button" onClick={() => onRevisit(n.id)}>
+                  {n.question}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {fresh.length > 0 ? (
         <p data-testid="fresh-count">
           {fresh.length} claim{fresh.length === 1 ? "" : "s"} you have not seen.
         </p>
-      ) : moved.length === 0 ? (
+      ) : moved.length === 0 && changed.length === 0 ? (
         // The honest empty case, and it is a real answer rather than a shrug: the
         // map is covered and still stands. "Nothing left to teach right now" said
         // the same thing in a way that read as a failure.
@@ -99,6 +125,9 @@ export function Returning({
 
       <button type="button" onClick={onContinue}>
         Continue
+      </button>
+      <button type="button" className="end" onClick={onEnd}>
+        End session
       </button>
     </section>
   );

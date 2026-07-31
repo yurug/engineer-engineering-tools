@@ -43,7 +43,10 @@ function isCitationLike(v: unknown): v is CitationInput {
  *   found here -- proven by the property-based test that generates random
  *   action/event payloads and asserts every embedded citation is visited
  */
-export function walkCitations(value: unknown, onFound: (slot: CitationSlot) => void): void {
+export function walkCitations(
+  value: unknown,
+  onFound: (slot: CitationSlot) => void,
+): void {
   if (Array.isArray(value)) {
     value.forEach((item, index) => {
       if (isCitationLike(item)) {

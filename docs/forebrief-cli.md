@@ -1,12 +1,30 @@
 # Command-line reference
 
-The agent drives forebrief through eight commands. They are specified in
-[`kb/spec/cli-contract.md`](../kb/spec/cli-contract.md), which is the authority if this page
-and the code ever disagree.
+The agent drives forebrief through eight commands.
 
-The packages are unpublished, so invoke them as
-`node packages/cli/dist/bin/forebrief.js <command>`, or run `npm link -w @forebrief/cli`
-once to get `forebrief` on your `PATH`.
+After installing the public toolsuite, invoke them as `forebrief <command>`.
+
+## Enable forebrief in a repository
+
+Create the tracked file `.forebrief/config.json` before invoking an agent
+workflow:
+
+```json
+{
+  "title": "My project decisions",
+  "foldIn": {
+    "adrDir": "kb/architecture/decisions",
+    "roundsDir": "kb",
+    "template": "default",
+    "idFormat": "ADR-%03d"
+  }
+}
+```
+
+Adjust the two directories to the repository's KB layout. `forebrief serve`
+creates runtime files and their nested `.gitignore`, but deliberately does not
+invent fold-in destinations. The agent skill considers forebrief enabled only
+when both the binary and this config file exist.
 
 | Command                                                        | Does                                                                                                                                                    |
 | -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |

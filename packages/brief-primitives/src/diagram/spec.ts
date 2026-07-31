@@ -81,7 +81,9 @@ function checkEdgeNodeIds(
 /** The diagram BODY: `meaning`/`nodes`/`edges` only, no envelope. Used
  *  standalone-wrapped below (`DiagramSpecSchema`) and reused verbatim as
  *  `FilmstripSpecSchema`'s `base` field. */
-export const DiagramBodySchema = z.strictObject(diagramBodyFields).superRefine(checkEdgeNodeIds);
+export const DiagramBodySchema = z
+  .strictObject(diagramBodyFields)
+  .superRefine(checkEdgeNodeIds);
 export type DiagramBody = z.infer<typeof DiagramBodySchema>;
 
 /** The full, standalone diagram spec: envelope fields + the body above. */

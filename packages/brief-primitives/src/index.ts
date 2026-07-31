@@ -16,10 +16,23 @@
 // loop a bundler's static analysis can't see through, silently dropping
 // named bindings). Same discipline here, including across ./diagram and
 // ./filmstrip's own index.ts files.
-export type { PrimitiveKind, Trust, PrimitiveEnvelopeShape } from "./envelope.js";
-export { PrimitiveKindSchema, TrustSchema, envelopeFields, sniffPrimitiveKind } from "./envelope.js";
+export type {
+  PrimitiveKind,
+  Trust,
+  PrimitiveEnvelopeShape,
+} from "./envelope.js";
+export {
+  PrimitiveKindSchema,
+  TrustSchema,
+  envelopeFields,
+  sniffPrimitiveKind,
+} from "./envelope.js";
 
-export { formatIssuePath, schemaErrorMessage, PrimitiveSchemaError } from "./schema-error.js";
+export {
+  formatIssuePath,
+  schemaErrorMessage,
+  PrimitiveSchemaError,
+} from "./schema-error.js";
 
 export type { SchemaVersionCheck } from "./version.js";
 export {

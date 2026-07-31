@@ -16,7 +16,10 @@
 // (AppError -> status -> {error} body, unmapped code -> 500) is what moves;
 // each consumer supplies its own code -> status table.
 import type { Context, Next } from "hono";
-import type { ClientErrorStatusCode, ServerErrorStatusCode } from "hono/utils/http-status";
+import type {
+  ClientErrorStatusCode,
+  ServerErrorStatusCode,
+} from "hono/utils/http-status";
 import { AppError } from "@brief/shared";
 import { identifyActor, type Tokens, type TokenActor } from "../auth";
 
@@ -76,13 +79,22 @@ export function makeErrorResponder(
       const appError = error as AppError<string>;
       const status = statusMap[appError.code] ?? defaultStatus;
       return c.json(
-        { error: { code: appError.code, message: appError.message, details: appError.details } },
+        {
+          error: {
+            code: appError.code,
+            message: appError.message,
+            details: appError.details,
+          },
+        },
         status,
       );
     }
     // Unrecognized (non-AppError) failure: "log pointer" -- the response
     // itself never leaks internals.
     console.error("[brief-core] unhandled error", error);
-    return c.json({ error: { code: "E_INTERNAL", message: "internal error" } }, 500);
+    return c.json(
+      { error: { code: "E_INTERNAL", message: "internal error" } },
+      500,
+    );
   };
 }

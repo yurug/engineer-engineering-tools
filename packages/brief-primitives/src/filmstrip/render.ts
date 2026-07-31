@@ -27,7 +27,8 @@ export type FilmstripRenderOutcome =
 function trueTextById(spec: Pick<FilmstripSpec, "base">): Map<string, string> {
   const map = new Map<string, string>();
   for (const node of spec.base.nodes) map.set(node.id, node.label);
-  for (const edge of spec.base.edges) if (edge.label) map.set(edgeId(edge), edge.label);
+  for (const edge of spec.base.edges)
+    if (edge.label) map.set(edgeId(edge), edge.label);
   return map;
 }
 
@@ -46,7 +47,8 @@ export async function renderFilmstripSteps(
   const baseText = trueTextById(spec);
   return spec.steps.map((step) => {
     const textForId = new Map(baseText);
-    for (const [id, text] of Object.entries(step.labels ?? {})) textForId.set(id, text);
+    for (const [id, text] of Object.entries(step.labels ?? {}))
+      textForId.set(id, text);
     const stepSvg = renderFilmstripStep(pinnedSvg, step, textForId);
     return {
       caption: step.caption,
@@ -79,13 +81,17 @@ export async function renderFilmstrip(
   const specVersion = versionOf(raw);
   if (specVersion !== undefined) {
     const versionCheck = checkSchemaVersion(specVersion);
-    if (!versionCheck.ok) return { status: "skew", svg: renderSkewBanner(versionCheck) };
+    if (!versionCheck.ok)
+      return { status: "skew", svg: renderSkewBanner(versionCheck) };
   }
   const parsed = FilmstripSpecSchema.safeParse(raw);
   if (!parsed.success) {
     return {
       status: "invalid",
-      error: new PrimitiveSchemaError("malformed filmstrip spec", parsed.error.issues),
+      error: new PrimitiveSchemaError(
+        "malformed filmstrip spec",
+        parsed.error.issues,
+      ),
     };
   }
   const steps = await renderFilmstripSteps(parsed.data, options);

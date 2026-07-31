@@ -17,13 +17,19 @@ export interface EvidenceMarkup {
 }
 
 export type EvidenceDispatchResult =
-  { ok: true; value: EvidenceMarkup } | { ok: false; error: PrimitiveSchemaError };
+  | { ok: true; value: EvidenceMarkup }
+  | { ok: false; error: PrimitiveSchemaError };
 
 /** Re-paths every issue under "evidence." so a claim-level consumer sees
  *  WHERE inside the nested spec a failure is (PR7) -- the evidence's own
  *  schema validates it standalone and has no idea it is nested here. */
-export function prefixIssuesWithEvidence(issues: readonly ZodIssue[]): ZodIssue[] {
-  return issues.map((issue) => ({ ...issue, path: ["evidence", ...issue.path] }));
+export function prefixIssuesWithEvidence(
+  issues: readonly ZodIssue[],
+): ZodIssue[] {
+  return issues.map((issue) => ({
+    ...issue,
+    path: ["evidence", ...issue.path],
+  }));
 }
 
 /**
@@ -89,7 +95,8 @@ async function dispatchFilmstrip(
   const { renderFilmstrip } = await import("../filmstrip/render.js");
   const outcome = await renderFilmstrip(evidence, embed);
   if (outcome.status === "invalid") return { ok: false, error: outcome.error };
-  if (outcome.status === "skew") return { ok: true, value: { markup: outcome.svg } };
+  if (outcome.status === "skew")
+    return { ok: true, value: { markup: outcome.svg } };
   // FilmstripSpecSchema requires steps.min(1) -- outcome.steps[0] always exists.
   const first = outcome.steps[0];
   return { ok: true, value: { markup: first ? first.svg : "" } };
@@ -105,7 +112,9 @@ async function dispatchChart(
   return { ok: true, value: { markup: outcome.svg } };
 }
 
-async function dispatchMatrix(evidence: unknown): Promise<EvidenceDispatchResult> {
+async function dispatchMatrix(
+  evidence: unknown,
+): Promise<EvidenceDispatchResult> {
   const { renderMatrix } = await import("../matrix/render.js");
   const outcome = renderMatrix(evidence); // matrix rendering is synchronous (PR6: pure DOM)
   if (outcome.status === "invalid") return { ok: false, error: outcome.error };
@@ -138,7 +147,10 @@ export async function renderEvidence(
       // so this stays defensive rather than dead code with no fallback.
       return {
         ok: false,
-        error: new PrimitiveSchemaError("unreachable: claim evidence rejected before dispatch", []),
+        error: new PrimitiveSchemaError(
+          "unreachable: claim evidence rejected before dispatch",
+          [],
+        ),
       };
   }
 }

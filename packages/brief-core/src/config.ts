@@ -35,7 +35,10 @@ export async function loadConfigFile<T>(
 ): Promise<T> {
   let raw: string;
   try {
-    raw = await fs.readFile(resolveStateDirPath(repoRoot, stateDirName, relPath), "utf8");
+    raw = await fs.readFile(
+      resolveStateDirPath(repoRoot, stateDirName, relPath),
+      "utf8",
+    );
   } catch {
     return defaultValue;
   }

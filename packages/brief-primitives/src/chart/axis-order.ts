@@ -47,6 +47,7 @@ export function sortForNominalAxis(
   // already carry an intrinsic numeric order, and neither is a category
   // whose order is up for decision.
   if (form === "histogram") return undefined;
-  if (nominalType !== "nominal" || opposingType !== "quantitative") return undefined;
+  if (nominalType !== "nominal" || opposingType !== "quantitative")
+    return undefined;
   return { field: opposingField, op: "median", order: "descending" };
 }

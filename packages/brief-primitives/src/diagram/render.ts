@@ -4,7 +4,11 @@ import { checkSchemaVersion, PRIMITIVES_SCHEMA_VERSION } from "../version.js";
 import { renderSkewBanner } from "../skew-banner.js";
 import { wrapWithTrustFrame, type EmbedOptions } from "../trust-frame.js";
 import { PrimitiveSchemaError } from "../schema-error.js";
-import { DiagramSpecSchema, type DiagramBody, type DiagramSpec } from "./spec.js";
+import {
+  DiagramSpecSchema,
+  type DiagramBody,
+  type DiagramSpec,
+} from "./spec.js";
 import { ENGINE_BY_MEANING } from "./engine-map.js";
 import { buildDot } from "./dot.js";
 import { layoutDot } from "./graphviz-instance.js";
@@ -56,13 +60,17 @@ export async function renderDiagram(
   const specVersion = versionOf(raw);
   if (specVersion !== undefined) {
     const versionCheck = checkSchemaVersion(specVersion);
-    if (!versionCheck.ok) return { status: "skew", svg: renderSkewBanner(versionCheck) };
+    if (!versionCheck.ok)
+      return { status: "skew", svg: renderSkewBanner(versionCheck) };
   }
   const parsed = DiagramSpecSchema.safeParse(raw);
   if (!parsed.success) {
     return {
       status: "invalid",
-      error: new PrimitiveSchemaError("malformed diagram spec", parsed.error.issues),
+      error: new PrimitiveSchemaError(
+        "malformed diagram spec",
+        parsed.error.issues,
+      ),
     };
   }
   const spec: DiagramSpec = parsed.data;

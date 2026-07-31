@@ -95,7 +95,8 @@ export function tokensToCssDeclarations(tokens: Tokens = TOKENS): string {
   const lines: string[] = [];
   const walk = (value: unknown, path: string[]): void => {
     if (typeof value === "object" && value !== null) {
-      for (const [key, child] of Object.entries(value)) walk(child, [...path, key]);
+      for (const [key, child] of Object.entries(value))
+        walk(child, [...path, key]);
       return;
     }
     lines.push(`--backbrief-${path.join("-")}: ${String(value)};`);

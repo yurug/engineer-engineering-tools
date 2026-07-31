@@ -13,5 +13,8 @@
 // enum or a numeric loop index, never from spec-provided free text, so no
 // attribute-escaping helper is needed here.
 export function escapeHtmlText(value: string): string {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }

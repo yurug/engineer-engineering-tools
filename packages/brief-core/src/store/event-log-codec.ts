@@ -47,7 +47,9 @@ export function parseLines(
     if (parsed.reason === null) {
       // Malformed JSON. Torn only if it is last; anywhere earlier is corruption.
       if (i === lines.length - 1) return { envelopes, tornAt: i };
-      throw new Error(`corrupt event log at ${filePath}: ${where} is not valid JSON`);
+      throw new Error(
+        `corrupt event log at ${filePath}: ${where} is not valid JSON`,
+      );
     }
     throw new Error(
       `corrupt event log at ${filePath}: ${where} parsed as JSON but is not a valid Envelope (${parsed.reason})`,
@@ -79,7 +81,9 @@ function parseEnvelopeLine(
 
 /** @returns the first schema complaint as "path: message", e.g. "id: must be a ULID". */
 function describeIssue(parsed: {
-  error: { issues: readonly { path: readonly PropertyKey[]; message: string }[] };
+  error: {
+    issues: readonly { path: readonly PropertyKey[]; message: string }[];
+  };
 }): string {
   const first = parsed.error.issues[0];
   if (!first) return "schema rejected the line";

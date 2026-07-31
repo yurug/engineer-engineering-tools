@@ -66,7 +66,10 @@ export async function renderChartBody(
 ): Promise<string> {
   const vegaLiteSpec = compileChartSpec(spec as ChartSpec);
   // Dynamic on purpose -- see this file's header.
-  const [{ compile }, vega] = await Promise.all([import("vega-lite"), import("vega")]);
+  const [{ compile }, vega] = await Promise.all([
+    import("vega-lite"),
+    import("vega"),
+  ]);
   const { spec: vgSpec } = compile(vegaLiteSpec as never);
   const view = new vega.View(vega.parse(vgSpec), { renderer: "none" });
   return await view.toSVG();
@@ -87,13 +90,17 @@ export async function renderChart(
   const specVersion = versionOf(raw);
   if (specVersion !== undefined) {
     const versionCheck = checkSchemaVersion(specVersion);
-    if (!versionCheck.ok) return { status: "skew", svg: renderSkewBanner(versionCheck) };
+    if (!versionCheck.ok)
+      return { status: "skew", svg: renderSkewBanner(versionCheck) };
   }
   const parsed = ChartSpecSchema.safeParse(raw);
   if (!parsed.success) {
     return {
       status: "invalid",
-      error: new PrimitiveSchemaError("malformed chart spec", parsed.error.issues),
+      error: new PrimitiveSchemaError(
+        "malformed chart spec",
+        parsed.error.issues,
+      ),
     };
   }
   const spec: ChartSpec = parsed.data;

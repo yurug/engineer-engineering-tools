@@ -105,7 +105,8 @@ export function buildDot(
   );
   // A causal chain reads left-to-right; every other meaning keeps
   // Graphviz's default top-to-bottom rank order.
-  if (engine === "dot" && body.meaning === "causal-chain") lines.push("  rankdir=LR;");
+  if (engine === "dot" && body.meaning === "causal-chain")
+    lines.push("  rankdir=LR;");
   for (const node of body.nodes) lines.push(renderNodeStatement(node));
   for (const edge of body.edges) lines.push(renderEdgeStatement(edge));
   lines.push("}");

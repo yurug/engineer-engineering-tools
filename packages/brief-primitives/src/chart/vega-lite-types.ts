@@ -82,7 +82,10 @@ export interface VLTextMark {
 
 export type VLWindowTransform = {
   readonly window: readonly { readonly op: "rank"; readonly as: string }[];
-  readonly sort: readonly { readonly field: string; readonly order: "descending" }[];
+  readonly sort: readonly {
+    readonly field: string;
+    readonly order: "descending";
+  }[];
   readonly groupby: readonly string[];
 };
 export type VLFilterTransform = { readonly filter: string };
@@ -131,7 +134,11 @@ export interface VLConfig {
   readonly point: { readonly filled: true; readonly size: number };
   readonly line: { readonly strokeWidth: number };
   readonly rule: { readonly stroke: string; readonly strokeWidth: number };
-  readonly text: { readonly font: string; readonly fontSize: number; readonly fill: string };
+  readonly text: {
+    readonly font: string;
+    readonly fontSize: number;
+    readonly fill: string;
+  };
 }
 
 /** The full compiled output: a single-view spec, or a `facet`-wrapped one
@@ -140,8 +147,12 @@ export interface VegaLiteSpec extends VLUnitSpec {
   readonly $schema: string;
   readonly data: VLData;
   readonly config: VLConfig;
-  readonly facet?: { readonly field: string; readonly type: "nominal" | "ordinal" };
+  readonly facet?: {
+    readonly field: string;
+    readonly type: "nominal" | "ordinal";
+  };
   readonly spec?: VLUnitSpec;
 }
 
-export const VEGA_LITE_SCHEMA_URL = "https://vega.github.io/schema/vega-lite/v6.json";
+export const VEGA_LITE_SCHEMA_URL =
+  "https://vega.github.io/schema/vega-lite/v6.json";

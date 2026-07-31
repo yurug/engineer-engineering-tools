@@ -27,7 +27,9 @@ const BOM = 0xfeff;
 export function normalizeContent(raw: string): string {
   const withoutBom = raw.charCodeAt(0) === BOM ? raw.slice(1) : raw;
   const unifiedNewlines = withoutBom.replace(/\r\n?/g, "\n");
-  const lines = unifiedNewlines.split("\n").map((line) => line.replace(/[ \t]+$/, ""));
+  const lines = unifiedNewlines
+    .split("\n")
+    .map((line) => line.replace(/[ \t]+$/, ""));
   return lines.join("\n");
 }
 
@@ -70,7 +72,10 @@ export function hashContext(
   startLine: number,
   endLine: number,
 ): string {
-  const before = allLines.slice(Math.max(0, startLine - 1 - CONTEXT_PADDING_LINES), startLine - 1);
+  const before = allLines.slice(
+    Math.max(0, startLine - 1 - CONTEXT_PADDING_LINES),
+    startLine - 1,
+  );
   const cited = allLines.slice(startLine - 1, endLine);
   const after = allLines.slice(endLine, endLine + CONTEXT_PADDING_LINES);
   return hashLines([...before, ...cited, ...after]);

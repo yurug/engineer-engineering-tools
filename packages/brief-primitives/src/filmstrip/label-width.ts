@@ -57,13 +57,20 @@ function nodeBoxWidth(svg: string, measureName: string): number {
   const block = new RegExp(
     `<title>${measureName}</title>[\\s\\S]*?(?:points="([^"]+)"|\\sd="([^"]+)")`,
   ).exec(svg);
-  if (!block) throw new Error(`measurement node "${measureName}" not found in Graphviz output`);
+  if (!block)
+    throw new Error(
+      `measurement node "${measureName}" not found in Graphviz output`,
+    );
   const geometry = block[1] ?? block[2]!;
   // Every x coordinate in either form: "x,y" pairs in a polygon, and the same
   // pairs interleaved with path commands (M/C/L) in a path.
-  const xs = [...geometry.matchAll(/(-?[\d.]+),-?[\d.]+/g)].map((m) => Number(m[1]));
+  const xs = [...geometry.matchAll(/(-?[\d.]+),-?[\d.]+/g)].map((m) =>
+    Number(m[1]),
+  );
   if (xs.length === 0) {
-    throw new Error(`measurement node "${measureName}" has no readable geometry`);
+    throw new Error(
+      `measurement node "${measureName}" has no readable geometry`,
+    );
   }
   return Math.max(...xs) - Math.min(...xs);
 }
@@ -126,8 +133,10 @@ export async function pinWidestLabels(
   const widestSoFar = new Map<string, MeasuredCandidate>();
   for (const candidate of measured) {
     const current = widestSoFar.get(candidate.id);
-    if (!current || candidate.width > current.width) widestSoFar.set(candidate.id, candidate);
+    if (!current || candidate.width > current.width)
+      widestSoFar.set(candidate.id, candidate);
   }
-  for (const [id, candidate] of widestSoFar) widestTextById.set(id, candidate.text);
+  for (const [id, candidate] of widestSoFar)
+    widestTextById.set(id, candidate.text);
   return { widestTextById };
 }

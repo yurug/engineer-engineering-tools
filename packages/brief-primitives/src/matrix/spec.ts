@@ -64,10 +64,18 @@ function checkMatrixReferences(
   const optionKeys = new Set(body.options.map((o) => o.key));
   const criteriaKeys = new Set(body.criteria.map((c) => c.key));
   if (optionKeys.size !== body.options.length) {
-    ctx.addIssue({ code: "custom", message: "duplicate option key", path: ["options"] });
+    ctx.addIssue({
+      code: "custom",
+      message: "duplicate option key",
+      path: ["options"],
+    });
   }
   if (criteriaKeys.size !== body.criteria.length) {
-    ctx.addIssue({ code: "custom", message: "duplicate criterion key", path: ["criteria"] });
+    ctx.addIssue({
+      code: "custom",
+      message: "duplicate criterion key",
+      path: ["criteria"],
+    });
   }
   for (const [optionKey, row] of Object.entries(body.cells)) {
     if (!optionKeys.has(optionKey)) {

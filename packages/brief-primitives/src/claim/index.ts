@@ -15,7 +15,10 @@ export type { EvidenceEnvelope, ClaimBody, ClaimSpec } from "./spec.js";
 export { ClaimBodySchema, ClaimSpecSchema } from "./spec.js";
 
 export type { AssertionCheck } from "./assertion-heuristic.js";
-export { looksLikeAssertion, ASSERTION_VERB_WORDS } from "./assertion-heuristic.js";
+export {
+  looksLikeAssertion,
+  ASSERTION_VERB_WORDS,
+} from "./assertion-heuristic.js";
 
 export type { ClaimRenderOutcome } from "./render.js";
 export { renderClaim } from "./render.js";

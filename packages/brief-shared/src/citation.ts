@@ -61,7 +61,10 @@ export type KbCitation = z.infer<typeof KbCitationSchema>;
 // Plain z.union (not z.discriminatedUnion): the Code* schemas above are
 // wrapped in `.refine`, which erases the object introspection
 // discriminatedUnion needs. A 2-member union pays no real cost here.
-export const CitationInputSchema = z.union([CodeCitationInputSchema, KbCitationSchema]);
+export const CitationInputSchema = z.union([
+  CodeCitationInputSchema,
+  KbCitationSchema,
+]);
 export type CitationInput = z.infer<typeof CitationInputSchema>;
 
 export const CitationSchema = z.union([CodeCitationSchema, KbCitationSchema]);

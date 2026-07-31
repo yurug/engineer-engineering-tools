@@ -13,7 +13,6 @@ import type { Envelope } from "@brief/shared";
 // about, and it really did resolve to `undefined` in the web bundle.
 import { FRONTIER_SOURCE_STATES } from "@brief/shared";
 import type { OverlayEntry, MasteryState, EvidenceKind, NodeResponsePayload } from "./overlay";
-import type { MapNode } from "./comprehension-map";
 
 interface PresentMovePayload {
   nodeId: string;
@@ -26,7 +25,6 @@ interface MoveResponsePayload {
 interface NodesInvalidatedPayload {
   nodeIds: string[];
 }
-
 
 /**
  * @param envelopes the full cross-session stream, in order (present_move

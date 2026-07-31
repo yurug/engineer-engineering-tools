@@ -51,6 +51,7 @@ export function App({ api }: { api: Api }): React.JSX.Element {
    * could not move to the next point" (ADR-030).
    */
   const [at, setAt] = useState<number | null>(null);
+  const [revisitId, setRevisitId] = useState<string | null>(null);
   const [closing, setClosing] = useState<SteerabilityStatement | null>(null);
   const [started, setStarted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,29 +64,42 @@ export function App({ api }: { api: Api }): React.JSX.Element {
     }
   }, [api]);
 
+  const endSession = useCallback(async () => {
+    try {
+      setClosing(await api.close());
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
+  }, [api]);
+
   useEffect(() => {
     void refresh();
   }, [refresh]);
 
   const claim = useCallback(
     async (mastery: Mastery) => {
-      const node = state ? currentNode(state, at) : undefined;
+      const node = state
+        ? (state.nodes.find((candidate) => candidate.id === revisitId) ?? currentNode(state, at))
+        : undefined;
       if (!node) return;
+      const wasRevisit = revisitId !== null;
       try {
         await api.setMastery(node.id, mastery);
         // Back to following the server: a claim changes what is teachable, and
         // staying on a browsed index would leave the engineer somewhere the
         // session no longer means.
         setAt(null);
+        setRevisitId(null);
         // Re-read rather than patching local state: the server re-grounds every
         // citation on each read, so a refresh is also how a rotted citation
         // starts showing as unverified without a reload.
         await refresh();
+        if (wasRevisit) setStarted(false);
       } catch (e) {
         setError(e instanceof Error ? e.message : String(e));
       }
     },
-    [api, at, refresh, state],
+    [api, at, refresh, revisitId, state],
   );
 
   if (error !== null) return <p className="error">{error}</p>;
@@ -110,12 +124,14 @@ export function App({ api }: { api: Api }): React.JSX.Element {
         <Returning
           nodes={state.nodes}
           mastery={state.mastery}
+          revised={state.revised ?? []}
           hasMaterial={state.fromMaterial.length > 0}
           onRevisit={(id) => {
-            setAt(teachableNodes(state).findIndex((n) => n.id === id));
+            setRevisitId(id);
             setStarted(true);
           }}
           onContinue={() => setStarted(true)}
+          onEnd={() => void endSession()}
         />
       </main>
     );
@@ -134,7 +150,8 @@ export function App({ api }: { api: Api }): React.JSX.Element {
   // `next` is the server's choice: the agenda's pick among what the graph allows.
   // Falling back to the fringe keeps an unplanned session working exactly as before.
   const teachable = teachableNodes(state);
-  const node = currentNode(state, at);
+  const node =
+    state.nodes.find((candidate) => candidate.id === revisitId) ?? currentNode(state, at);
   const position = teachable.findIndex((n) => n.id === node?.id);
   if (!node) {
     // Two different nothings, and conflating them would mislead. An empty map
@@ -147,6 +164,16 @@ export function App({ api }: { api: Api }): React.JSX.Element {
             ? "Nothing in the map yet. The agent has not proposed anything to teach."
             : "Everything reachable is covered. Nothing here is waiting on a prerequisite you have not claimed."}
         </p>
+        {state.nodes.length > 0 && (
+          <nav className="session-nav">
+            <button type="button" onClick={() => setStarted(false)}>
+              Review map
+            </button>
+            <button type="button" className="end" onClick={() => void endSession()}>
+              End session
+            </button>
+          </nav>
+        )}
       </main>
     );
   }
@@ -175,16 +202,7 @@ export function App({ api }: { api: Api }): React.JSX.Element {
           Next
         </button>
         {/* Ending the session is the engineer's, never the agent's (ADR-003). */}
-        <button
-          type="button"
-          className="end"
-          onClick={() =>
-            void api
-              .close()
-              .then(setClosing)
-              .catch(() => undefined)
-          }
-        >
+        <button type="button" className="end" onClick={() => void endSession()}>
           End session
         </button>
       </nav>

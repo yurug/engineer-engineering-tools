@@ -39,13 +39,20 @@ export async function mountStaticWeb<E extends Env>(
 
   app.get("*", async (c) => {
     const requestPath = new URL(c.req.url).pathname;
-    const relative = requestPath === "/" ? "index.html" : requestPath.replace(/^\/+/, "");
+    const relative =
+      requestPath === "/" ? "index.html" : requestPath.replace(/^\/+/, "");
     const candidate = safeJoin(webDistDir, relative);
     const served = candidate ? await tryServeFile(candidate) : null;
-    if (served) return c.text(served.body, 200, { "Content-Type": served.contentType });
+    if (served)
+      return c.text(served.body, 200, { "Content-Type": served.contentType });
     // SPA fallback: any non-file path (client-side route) gets index.html.
-    const indexFile = await fs.readFile(path.join(webDistDir, "index.html"), "utf8");
-    return c.text(indexFile, 200, { "Content-Type": "text/html; charset=utf-8" });
+    const indexFile = await fs.readFile(
+      path.join(webDistDir, "index.html"),
+      "utf8",
+    );
+    return c.text(indexFile, 200, {
+      "Content-Type": "text/html; charset=utf-8",
+    });
   });
   return true;
 }

@@ -32,7 +32,8 @@ export function createFilmstripStepper(
   target: FilmstripStepperTarget,
   steps: readonly { svg: string; caption: string }[],
 ): FilmstripStepper {
-  if (steps.length === 0) throw new Error("createFilmstripStepper: no steps to show");
+  if (steps.length === 0)
+    throw new Error("createFilmstripStepper: no steps to show");
   let index = 0;
   const render = (): void => {
     target.innerHTML = steps[index]!.svg;

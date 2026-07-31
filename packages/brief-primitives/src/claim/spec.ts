@@ -58,7 +58,10 @@ function checkAssertion(body: ClaimBodyLike, ctx: z.RefinementCtx): void {
  *   another claim is an outline, not a card." Rejected at its own
  *   `evidence.kind` path (PR7).
  */
-function checkEvidenceNotClaim(body: ClaimBodyLike, ctx: z.RefinementCtx): void {
+function checkEvidenceNotClaim(
+  body: ClaimBodyLike,
+  ctx: z.RefinementCtx,
+): void {
   if (body.evidence.kind === "claim") {
     ctx.addIssue({
       code: "custom",
@@ -77,7 +80,9 @@ function checkClaimBody(body: ClaimBodyLike, ctx: z.RefinementCtx): void {
 
 /** The claim BODY: assertion/evidence/caveat only, no envelope -- same
  *  split as diagram/spec.ts's DiagramBodySchema. */
-export const ClaimBodySchema = z.strictObject(claimBodyFields).superRefine(checkClaimBody);
+export const ClaimBodySchema = z
+  .strictObject(claimBodyFields)
+  .superRefine(checkClaimBody);
 export type ClaimBody = z.infer<typeof ClaimBodySchema>;
 
 /** The full, standalone claim spec: envelope fields + the body above. */

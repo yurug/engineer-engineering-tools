@@ -67,7 +67,10 @@ export const CHART_CONFIG: VLConfig = {
   // 2px stroke competes with the gridlines behind it.
   point: { filled: true, size: 56 },
   line: { strokeWidth: TOKENS.stroke.chartMarkWidth },
-  rule: { stroke: TOKENS.color.border, strokeWidth: TOKENS.stroke.chartRuleWidth },
+  rule: {
+    stroke: TOKENS.color.border,
+    strokeWidth: TOKENS.stroke.chartRuleWidth,
+  },
   // The inline series end-labels ./compile.ts emits instead of a legend
   // (P-C) are text marks, and they are content, not furniture.
   text: {

@@ -29,11 +29,29 @@ export type { Clock, IdGenerator } from "./ports";
 
 export { systemClock, ulidGenerator } from "./adapters";
 
-export type { Citation, CitationInput, CitationValidationResult, CodeCitation, CodeCitationInput, KbCitation, ValidationState } from "./citation";
-export { CitationInputSchema, CitationSchema, CodeCitationInputSchema, CodeCitationSchema, KbCitationSchema } from "./citation";
+export type {
+  Citation,
+  CitationInput,
+  CitationValidationResult,
+  CodeCitation,
+  CodeCitationInput,
+  KbCitation,
+  ValidationState,
+} from "./citation";
+export {
+  CitationInputSchema,
+  CitationSchema,
+  CodeCitationInputSchema,
+  CodeCitationSchema,
+  KbCitationSchema,
+} from "./citation";
 
 export type { CitationSlot } from "./citation-walk";
-export { collectCitationInputs, mintCodeCitations, walkCitations } from "./citation-walk";
+export {
+  collectCitationInputs,
+  mintCodeCitations,
+  walkCitations,
+} from "./citation-walk";
 
 export type { Actor, Envelope } from "./envelope";
 export { EnvelopeSchema, UlidSchema } from "./envelope";
@@ -43,6 +61,10 @@ export { isPropertyIdAnchor } from "./kb-anchor";
 export { githubHeadingSlug, headingSlugsOf } from "./heading-slug";
 
 export type { FrontierNode, FrontierState, NodeState } from "./frontier";
-export { FRONTIER_SOURCE_STATES, MASTERED_STATES, computeFrontier } from "./frontier";
+export {
+  FRONTIER_SOURCE_STATES,
+  MASTERED_STATES,
+  computeFrontier,
+} from "./frontier";
 
 export { hashContext, hashLines, normalizeContent } from "./normalize";

@@ -49,7 +49,10 @@ function unrecognizedKeys(issue: ZodIssue): readonly string[] | null {
  *   the key name itself) is always present in the returned string, never
  *   only in a `details` object a caller might not read.
  */
-export function schemaErrorMessage(prefix: string, issues: readonly ZodIssue[]): string {
+export function schemaErrorMessage(
+  prefix: string,
+  issues: readonly ZodIssue[],
+): string {
   const first = issues[0];
   if (!first) return `${prefix}: no validation issues reported`;
   const more = issues.length > 1 ? ` (+${String(issues.length - 1)} more)` : "";

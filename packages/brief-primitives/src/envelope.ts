@@ -30,7 +30,13 @@ import { z } from "zod/mini";
  * full from step 1 because kb/primitives/spec.md's envelope already named
  * all five, so extending it here was never needed.
  */
-export const PrimitiveKindSchema = z.enum(["diagram", "filmstrip", "chart", "matrix", "claim"]);
+export const PrimitiveKindSchema = z.enum([
+  "diagram",
+  "filmstrip",
+  "chart",
+  "matrix",
+  "claim",
+]);
 export type PrimitiveKind = z.infer<typeof PrimitiveKindSchema>;
 
 /** Whole-visual trust, always at its weakest claim (ADR-011, PR3). */

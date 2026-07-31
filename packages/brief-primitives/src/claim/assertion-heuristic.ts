@@ -156,7 +156,9 @@ export function looksLikeAssertion(text: string): AssertionCheck {
         `subject and a verb`,
     };
   }
-  const hasVerb = words.some((w) => ASSERTION_VERB_WORDS.has(stripPunctuation(w).toLowerCase()));
+  const hasVerb = words.some((w) =>
+    ASSERTION_VERB_WORDS.has(stripPunctuation(w).toLowerCase()),
+  );
   if (!hasVerb) {
     return {
       ok: false,

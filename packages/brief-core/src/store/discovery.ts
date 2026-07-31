@@ -11,7 +11,13 @@ import * as net from "node:net";
 import * as path from "node:path";
 import { AppError } from "@brief/shared";
 import { resolveStateDirPath } from "../fsguard";
-import { isPidAlive, readLock, removeLock, writeLock, type LockInfo } from "./lock";
+import {
+  isPidAlive,
+  readLock,
+  removeLock,
+  writeLock,
+  type LockInfo,
+} from "./lock";
 
 /** How long to wait for the recorded server to accept a TCP connection before
  *  concluding it is wedged/gone. Loopback connects succeed in well under a
@@ -25,7 +31,10 @@ const REACHABILITY_TIMEOUT_MS = 500;
  *   can be REUSED by an unrelated process. Probing the port distinguishes
  *   "genuinely serving" from both, where `process.kill(pid, 0)` cannot.
  */
-export function isServerResponding(port: number, host = "127.0.0.1"): Promise<boolean> {
+export function isServerResponding(
+  port: number,
+  host = "127.0.0.1",
+): Promise<boolean> {
   return new Promise((resolve) => {
     const socket = net.connect({ port, host });
     // A single resolver guarded against the connect/error/timeout race.
@@ -57,7 +66,11 @@ export async function writeServerJson(
   stateDirName: string,
   info: ServerInfo,
 ): Promise<void> {
-  const filePath = resolveStateDirPath(repoRoot, stateDirName, SERVER_JSON_RELATIVE_PATH);
+  const filePath = resolveStateDirPath(
+    repoRoot,
+    stateDirName,
+    SERVER_JSON_RELATIVE_PATH,
+  );
   await fs.mkdir(path.dirname(filePath), { recursive: true });
   await fs.writeFile(filePath, JSON.stringify(info, null, 2) + "\n", "utf8");
 }
@@ -78,10 +91,16 @@ export async function readServerJson(
   }
 }
 
-export async function removeServerJson(repoRoot: string, stateDirName: string): Promise<void> {
-  await fs.rm(resolveStateDirPath(repoRoot, stateDirName, SERVER_JSON_RELATIVE_PATH), {
-    force: true,
-  });
+export async function removeServerJson(
+  repoRoot: string,
+  stateDirName: string,
+): Promise<void> {
+  await fs.rm(
+    resolveStateDirPath(repoRoot, stateDirName, SERVER_JSON_RELATIVE_PATH),
+    {
+      force: true,
+    },
+  );
 }
 
 /**
@@ -110,14 +129,22 @@ export async function recoverStaleArtifactsOrThrow(
   // Any weaker evidence (dead pid, missing server.json, or an unresponsive
   // port) means the artifacts are stale -- clean them and let `serve` proceed
   // rather than blocking the user behind a corpse.
-  if (lock.pid && isPidAlive(lock.pid) && info && (await isServerResponding(info.port))) {
+  if (
+    lock.pid &&
+    isPidAlive(lock.pid) &&
+    info &&
+    (await isServerResponding(info.port))
+  ) {
     throw new AppError(
       "E_ALREADY_RUNNING",
       `a server is already running for this repo (pid ${lock.pid}, ${info.url})`,
       { pid: lock.pid, url: info.url },
     );
   }
-  await Promise.all([removeLock(repoRoot, stateDirName), removeServerJson(repoRoot, stateDirName)]);
+  await Promise.all([
+    removeLock(repoRoot, stateDirName),
+    removeServerJson(repoRoot, stateDirName),
+  ]);
 }
 
 export { writeLock, removeLock, isPidAlive, type LockInfo };

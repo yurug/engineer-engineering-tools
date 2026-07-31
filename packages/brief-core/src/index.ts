@@ -9,9 +9,18 @@
 // here, named, or it does not exist for consumers of this package.
 export { AppError, type ErrorCode, type Result, ok, err } from "@brief/shared";
 
-export { resolveRepoPath, resolveStateDirPath, isUnderStateDir } from "./fsguard";
+export {
+  resolveRepoPath,
+  resolveStateDirPath,
+  isUnderStateDir,
+} from "./fsguard";
 
-export { generateTokens, identifyActor, type Tokens, type TokenActor } from "./auth";
+export {
+  generateTokens,
+  identifyActor,
+  type Tokens,
+  type TokenActor,
+} from "./auth";
 
 export { resolveRepoRoot } from "./git";
 
@@ -61,7 +70,10 @@ export {
   type SearchWindow,
 } from "./validate/citation";
 
-export { validateEnvelopeCitations, type ValidationReport } from "./validate/envelope";
+export {
+  validateEnvelopeCitations,
+  type ValidationReport,
+} from "./validate/envelope";
 
 export { revalidatePaths, type RevalidateDeps } from "./validate/revalidate";
 

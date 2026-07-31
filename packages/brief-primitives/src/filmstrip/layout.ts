@@ -28,7 +28,9 @@ function withWidestLabels(
     label: widestTextById.get(node.id) ?? node.label,
   }));
   const edges: DiagramEdge[] = base.edges.map((edge) =>
-    edge.label ? { ...edge, label: widestTextById.get(edgeId(edge)) ?? edge.label } : edge,
+    edge.label
+      ? { ...edge, label: widestTextById.get(edgeId(edge)) ?? edge.label }
+      : edge,
   );
   return { meaning: base.meaning, nodes, edges };
 }

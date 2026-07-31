@@ -53,7 +53,11 @@ function axisTitle(axis: Pick<ChartAxis, "label" | "unit">): string {
   return axis.unit ? `${axis.label} (${axis.unit})` : axis.label;
 }
 
-function buildAxisEncoding(axis: ChartAxis, type: VLFieldType, bin: boolean): VLPositionEncoding {
+function buildAxisEncoding(
+  axis: ChartAxis,
+  type: VLFieldType,
+  bin: boolean,
+): VLPositionEncoding {
   return {
     field: axis.field,
     type,
@@ -67,7 +71,10 @@ function buildAxisEncoding(axis: ChartAxis, type: VLFieldType, bin: boolean): VL
  *  `spec.y.field` is read for nothing here; only `spec.y.label`/`.unit`
  *  name the axis (kb/primitives/spec.md's chart section records this as
  *  the compiler's own decision, not something the schema states). */
-function buildYEncoding(spec: ChartSpec, yType: VLFieldType): VLPositionEncoding {
+function buildYEncoding(
+  spec: ChartSpec,
+  yType: VLFieldType,
+): VLPositionEncoding {
   if (spec.form !== "histogram") return buildAxisEncoding(spec.y, yType, false);
   return { aggregate: "count", type: "quantitative", title: axisTitle(spec.y) };
 }
@@ -163,12 +170,20 @@ function buildUnitSpec(spec: ChartSpec): UnitSpec {
 export function compileChartSpec(spec: ChartSpec): VegaLiteSpec {
   const data = { values: spec.data.rows };
   const unit = buildUnitSpec(spec);
-  if (!spec.facet) return { $schema: VEGA_LITE_SCHEMA_URL, data, config: CHART_CONFIG, ...unit };
+  if (!spec.facet)
+    return {
+      $schema: VEGA_LITE_SCHEMA_URL,
+      data,
+      config: CHART_CONFIG,
+      ...unit,
+    };
   // Facet channel needs a DISCRETE type; a numeric facet field still
   // facets (one panel per distinct value), so it reads as "ordinal", not
   // "quantitative" (which Vega-Lite's facet channel does not support).
   const facetType =
-    inferFieldType(spec.data.rows, spec.facet.field) === "quantitative" ? "ordinal" : "nominal";
+    inferFieldType(spec.data.rows, spec.facet.field) === "quantitative"
+      ? "ordinal"
+      : "nominal";
   return {
     $schema: VEGA_LITE_SCHEMA_URL,
     data,

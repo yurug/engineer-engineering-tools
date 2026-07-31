@@ -18,7 +18,10 @@ const HEADING_LINE = /^#{1,6}\s+(.*)$/;
  * slug -- `seenCounts` accumulates across a whole document, so pass the
  * SAME map instance across an ordered walk of a file's headings.
  */
-export function githubHeadingSlug(heading: string, seenCounts: Map<string, number>): string {
+export function githubHeadingSlug(
+  heading: string,
+  seenCounts: Map<string, number>,
+): string {
   const base = heading
     .toLowerCase()
     .replace(/[^\w\- ]+/g, "")
@@ -35,7 +38,8 @@ export function headingSlugsOf(markdown: string): Set<string> {
   const slugs = new Set<string>();
   for (const line of markdown.split(/\r\n|\r|\n/)) {
     const match = HEADING_LINE.exec(line);
-    if (match?.[1] !== undefined) slugs.add(githubHeadingSlug(match[1], seenCounts));
+    if (match?.[1] !== undefined)
+      slugs.add(githubHeadingSlug(match[1], seenCounts));
   }
   return slugs;
 }

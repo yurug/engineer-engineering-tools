@@ -1,14 +1,14 @@
 // Module: store/bootstrap -- first-run setup of `.backbrief/`.
 //
 // config-and-formats.md: "backbrief creates .backbrief/.gitignore
-// containing server.json and server.lock on first run, so accidental
+// containing server.json, server.lock and server.log on first run, so accidental
 // commits of live state are impossible while everything else stays
 // committable." Idempotent -- safe to call on every `serve` startup.
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { resolveBackbriefPath } from "../fsguard";
 
-const GITIGNORE_CONTENT = "server.json\nserver.lock\n";
+const GITIGNORE_CONTENT = "server.json\nserver.lock\nserver.log\n";
 
 export async function ensureBackbriefGitignore(repoRoot: string): Promise<void> {
   const filePath = resolveBackbriefPath(repoRoot, ".gitignore");

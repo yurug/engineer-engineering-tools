@@ -19,7 +19,12 @@ import { renderSkewBanner } from "../skew-banner.js";
 import { PrimitiveSchemaError } from "../schema-error.js";
 import { TOKENS } from "../tokens.js";
 import type { Trust } from "../envelope.js";
-import { MatrixSpecSchema, type MatrixCell, type MatrixOption, type MatrixSpec } from "./spec.js";
+import {
+  MatrixSpecSchema,
+  type MatrixCell,
+  type MatrixOption,
+  type MatrixSpec,
+} from "./spec.js";
 import { escapeHtmlText } from "./html-utils.js";
 
 export type MatrixRenderOutcome =
@@ -54,7 +59,11 @@ function weakestTrust(spec: MatrixSpec): Trust {
 /** @returns one `<td>` -- an explicit dash (never blank) when `spec.cells`
  *  has no entry for this option/criterion pair (kb/primitives/spec.md:
  *  "an unstated trade-off is information"). */
-function renderCell(spec: MatrixSpec, optionKey: string, criterionKey: string): string {
+function renderCell(
+  spec: MatrixSpec,
+  optionKey: string,
+  criterionKey: string,
+): string {
   const cell: MatrixCell | undefined = spec.cells[optionKey]?.[criterionKey];
   if (!cell) {
     return `<td class="backbrief-matrix-cell backbrief-matrix-cell--missing" aria-label="no stated trade-off">—</td>`;
@@ -77,7 +86,9 @@ function renderOptionRow(spec: MatrixSpec, option: MatrixOption): string {
   const marker = isRecommended
     ? ` <span class="backbrief-matrix-recommended">recommended</span>`
     : "";
-  const cells = spec.criteria.map((c) => renderCell(spec, option.key, c.key)).join("");
+  const cells = spec.criteria
+    .map((c) => renderCell(spec, option.key, c.key))
+    .join("");
   return `<tr><th scope="row">${escapeHtmlText(option.label)}${marker}</th>${cells}</tr>`;
 }
 
@@ -134,13 +145,17 @@ export function renderMatrix(raw: unknown): MatrixRenderOutcome {
   const specVersion = versionOf(raw);
   if (specVersion !== undefined) {
     const versionCheck = checkSchemaVersion(specVersion);
-    if (!versionCheck.ok) return { status: "skew", html: renderSkewBanner(versionCheck) };
+    if (!versionCheck.ok)
+      return { status: "skew", html: renderSkewBanner(versionCheck) };
   }
   const parsed = MatrixSpecSchema.safeParse(raw);
   if (!parsed.success) {
     return {
       status: "invalid",
-      error: new PrimitiveSchemaError("malformed matrix spec", parsed.error.issues),
+      error: new PrimitiveSchemaError(
+        "malformed matrix spec",
+        parsed.error.issues,
+      ),
     };
   }
   return { status: "ok", html: renderMatrixBody(parsed.data) };

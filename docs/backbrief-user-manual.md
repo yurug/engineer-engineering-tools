@@ -1,6 +1,5 @@
 # backbrief user manual
 
-
 > **Note (2026-07-26): this manual describes the v1 session model** (tours, cards,
 > the coverage map). The v2 UI teaches through a comprehension map and one move per
 > screen; the legacy actions still post but the interface no longer renders them.

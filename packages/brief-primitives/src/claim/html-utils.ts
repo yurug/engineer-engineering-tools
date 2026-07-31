@@ -11,5 +11,8 @@
 // the rendered output only through escapeHtmlText; ./render.ts never
 // interpolates one of these fields raw.
 export function escapeHtmlText(value: string): string {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }

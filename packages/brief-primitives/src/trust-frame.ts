@@ -81,7 +81,9 @@ export function wrapWithTrustFrame(
   const outerHeight = height + inset * 2;
   const strokeWidth = TOKENS.stroke.frameWidth;
   const isConjecture = trust === "conjecture" && chrome;
-  const dashAttr = isConjecture ? ` stroke-dasharray="${TOKENS.stroke.frameDash}"` : "";
+  const dashAttr = isConjecture
+    ? ` stroke-dasharray="${TOKENS.stroke.frameDash}"`
+    : "";
   const frameColor = isConjecture ? TOKENS.color.conjecture : TOKENS.color.ink;
   const provenanceAttrs = options.primitive
     ? ` data-primitive="${options.primitive}"${options.schemaVersion ? ` data-primitives-version="${options.schemaVersion}"` : ""}`

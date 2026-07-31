@@ -45,6 +45,8 @@ export interface GroundedNode {
 export interface SessionState {
   nodes: GroundedNode[];
   mastery: Record<string, Mastery>;
+  /** Held claims revised since the engineer last set mastery on that node. */
+  revised?: string[];
   /**
    * Ids teachable right now: every prerequisite held, this one not yet.
    *

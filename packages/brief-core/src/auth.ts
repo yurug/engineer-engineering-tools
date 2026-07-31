@@ -28,7 +28,10 @@ export type TokenActor = "agent" | "human";
  * @returns which actor role that token belongs to
  * @throws {AppError} E_AUTH if `presented` matches neither token
  */
-export function identifyActor(presented: string | undefined, tokens: Tokens): TokenActor {
+export function identifyActor(
+  presented: string | undefined,
+  tokens: Tokens,
+): TokenActor {
   if (presented === tokens.agentToken) return "agent";
   if (presented === tokens.humanToken) return "human";
   throw new AppError("E_AUTH", "Not authorized — token missing or wrong.");

@@ -36,7 +36,9 @@ const ROOT_SVG_DIMENSIONS_RE =
 export function svgDimensions(svg: string): SvgDimensions {
   const match = ROOT_SVG_DIMENSIONS_RE.exec(svg);
   if (!match)
-    throw new Error("not a Graphviz- or Vega-shaped SVG: no root width/height attributes");
+    throw new Error(
+      "not a Graphviz- or Vega-shaped SVG: no root width/height attributes",
+    );
   return { width: Number(match[1]), height: Number(match[2]) };
 }
 
@@ -49,7 +51,8 @@ export function svgBody(svg: string): string {
   if (!openMatch) throw new Error("not an SVG document: no root <svg> tag");
   const start = openMatch.index + openMatch[0].length;
   const end = svg.lastIndexOf("</svg>");
-  if (end === -1 || end < start) throw new Error("not an SVG document: no closing </svg> tag");
+  if (end === -1 || end < start)
+    throw new Error("not an SVG document: no closing </svg> tag");
   return svg.slice(start, end);
 }
 
@@ -64,5 +67,8 @@ export function svgBody(svg: string): string {
  *   text, never as a parsed element.
  */
 export function escapeXmlText(value: string): string {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
 }

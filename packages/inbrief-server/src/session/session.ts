@@ -79,6 +79,8 @@ export interface SessionState {
   intent: string | null;
   /** Every node has an entry; a node nobody has touched is `unseen`, never absent. */
   mastery: Record<string, Mastery>;
+  /** Held node ids whose claim changed after the latest human mastery record. */
+  revised: string[];
   /** Ids the project already carried, as against ids this session learned. */
   fromMaterial: string[];
   /** Things worth acting on rather than reading, noticed while teaching. */
@@ -245,6 +247,7 @@ export class Session {
   state(): SessionState {
     const nodes: StoredNode[] = [];
     const mastery: Record<string, Mastery> = {};
+    const revised = new Set<string>();
     const fromMaterial = new Set<string>();
     const findings: { text: string; citation: unknown }[] = [];
     const questions: SessionQuestion[] = [];
@@ -262,14 +265,27 @@ export class Session {
           // the same id replaces it and must not create a twin.
           const at = nodes.findIndex((n) => n.id === node.id);
           if (at === -1) nodes.push(node);
-          else nodes[at] = node;
+          else {
+            const previous = nodes[at] as StoredNode;
+            if (
+              JSON.stringify(previous) !== JSON.stringify(node) &&
+              mastery[node.id] !== undefined &&
+              mastery[node.id] !== "unseen"
+            ) {
+              revised.add(node.id);
+            }
+            nodes[at] = node;
+          }
           mastery[node.id] ??= "unseen";
           if (payload["source"] === "material") fromMaterial.add(node.id);
           break;
         }
-        case "mastery":
-          mastery[String(payload["node"])] = payload["mastery"] as Mastery;
+        case "mastery": {
+          const nodeId = String(payload["node"]);
+          mastery[nodeId] = payload["mastery"] as Mastery;
+          revised.delete(nodeId);
           break;
+        }
         case "finding":
           findings.push({ text: String(payload["text"]), citation: envelope.refs[0] });
           break;
@@ -313,6 +329,7 @@ export class Session {
     return {
       nodes,
       mastery,
+      revised: [...revised],
       fromMaterial: [...fromMaterial],
       findings,
       questions,

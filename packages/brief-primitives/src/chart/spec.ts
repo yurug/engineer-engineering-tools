@@ -17,7 +17,13 @@ import { envelopeFields } from "../envelope.js";
 import { distinctFieldValues } from "./data-utils.js";
 import { MAX_CHART_SERIES_VALUES } from "./palette.js";
 
-export const ChartFormSchema = z.enum(["line", "bar", "scatter", "histogram", "box"]);
+export const ChartFormSchema = z.enum([
+  "line",
+  "bar",
+  "scatter",
+  "histogram",
+  "box",
+]);
 export type ChartForm = z.infer<typeof ChartFormSchema>;
 
 const ChartCellValueSchema = z.union([z.string(), z.number()]);
@@ -62,7 +68,10 @@ interface ChartBodyLike {
  *   value fails at `series.field`" -- named here exactly as the spec
  *   promises, not a generic top-level message.
  */
-function checkSeriesCardinality(body: ChartBodyLike, ctx: z.RefinementCtx): void {
+function checkSeriesCardinality(
+  body: ChartBodyLike,
+  ctx: z.RefinementCtx,
+): void {
   if (!body.series) return;
   const distinct = distinctFieldValues(body.data.rows, body.series.field);
   if (distinct.length > MAX_CHART_SERIES_VALUES) {
@@ -80,7 +89,9 @@ function checkSeriesCardinality(body: ChartBodyLike, ctx: z.RefinementCtx): void
 /** The chart BODY: form/data/x/y/series/facet only, no envelope -- same
  *  split as diagram/spec.ts's DiagramBodySchema, kept for symmetry even
  *  though no other spec currently embeds a chart body standalone. */
-export const ChartBodySchema = z.strictObject(chartBodyFields).superRefine(checkSeriesCardinality);
+export const ChartBodySchema = z
+  .strictObject(chartBodyFields)
+  .superRefine(checkSeriesCardinality);
 export type ChartBody = z.infer<typeof ChartBodySchema>;
 
 /** The full, standalone chart spec: envelope fields + the body above. */

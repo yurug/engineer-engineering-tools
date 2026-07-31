@@ -29,7 +29,10 @@ import type { CitationRepoAccess, CitationKbAccess } from "../content-access";
 import { memoizeRevReads } from "../repo-cache";
 import type { Tokens } from "../auth";
 import type { PresenceSink } from "../api/middleware";
-import { validateEnvelopeCitations, type ValidationReport } from "../validate/envelope";
+import {
+  validateEnvelopeCitations,
+  type ValidationReport,
+} from "../validate/envelope";
 
 export interface WsHubDeps {
   tokens: Tokens;
@@ -92,7 +95,10 @@ export function attachWsHub(httpServer: HttpServer, deps: WsHubDeps): WsHub {
   return {
     broadcastValidationUpdate(updates: CitationValidationResult[]): void {
       if (updates.length === 0) return; // nothing changed for anyone visible -- don't wake idle tabs for an empty frame
-      const frame: ValidationUpdateFrame = { kind: "validation_update", updates };
+      const frame: ValidationUpdateFrame = {
+        kind: "validation_update",
+        updates,
+      };
       const body = JSON.stringify(frame);
       for (const ws of clients) {
         if (ws.readyState === ws.OPEN) ws.send(body);
@@ -105,7 +111,11 @@ export function attachWsHub(httpServer: HttpServer, deps: WsHubDeps): WsHub {
   };
 }
 
-async function handleConnection(ws: WebSocket, since: number, deps: WsHubDeps): Promise<void> {
+async function handleConnection(
+  ws: WebSocket,
+  since: number,
+  deps: WsHubDeps,
+): Promise<void> {
   deps.presence.markSeen("human");
   // One memoizing wrapper for THIS client's whole connection -- the backlog
   // loop below can re-validate the SAME historical envelope's rev-pinned
@@ -119,7 +129,9 @@ async function handleConnection(ws: WebSocket, since: number, deps: WsHubDeps): 
   // calls may `await`.
   const backlog = deps.eventStore.readSince(since);
   const emitter = new EventEmitter();
-  const unsubscribeStore = deps.eventStore.subscribe((envelope) => emitter.emit("item", envelope));
+  const unsubscribeStore = deps.eventStore.subscribe((envelope) =>
+    emitter.emit("item", envelope),
+  );
   const liveEvents = on(emitter, "item");
 
   ws.on("message", () => deps.presence.markSeen("human")); // "Client sends nothing but ping"
@@ -155,6 +167,10 @@ async function sendEnvelopeFrame(
 ): Promise<void> {
   if (ws.readyState !== ws.OPEN) return;
   const report = await validateEnvelopeCitations(envelope, repo, deps.kb);
-  const frame: EnvelopeFrame = { kind: "envelope", envelope, validation: report.results };
+  const frame: EnvelopeFrame = {
+    kind: "envelope",
+    envelope,
+    validation: report.results,
+  };
   ws.send(JSON.stringify(frame));
 }

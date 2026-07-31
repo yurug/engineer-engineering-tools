@@ -15,7 +15,11 @@
 // notion of parallel edges between the same pair).
 import { z } from "zod";
 import { envelopeFields } from "../envelope.js";
-import { DiagramBodySchema, type DiagramBody, type DiagramEdge } from "../diagram/spec.js";
+import {
+  DiagramBodySchema,
+  type DiagramBody,
+  type DiagramEdge,
+} from "../diagram/spec.js";
 
 /** The filmstrip-facing id for an edge -- see this file's header. */
 export function edgeId(edge: Pick<DiagramEdge, "from" | "to">): string {
@@ -38,7 +42,10 @@ export type FilmstripStep = z.infer<typeof FilmstripStepSchema>;
 /** @invariant PR7 -- a step referencing an id absent from `base` fails at
  *   its own `steps[i].show[j]` / `.emphasize[j]` / `.labels.<id>` path. */
 function checkStepIdsExistInBase(
-  spec: { base: Pick<DiagramBody, "nodes" | "edges">; steps: readonly FilmstripStep[] },
+  spec: {
+    base: Pick<DiagramBody, "nodes" | "edges">;
+    steps: readonly FilmstripStep[];
+  },
   ctx: z.RefinementCtx,
 ): void {
   const validIds = new Set<string>([

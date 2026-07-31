@@ -10,7 +10,13 @@
 // Key design decision: explicit named re-exports, NOT `export * from` --
 // see ../index.ts's header for the full Vite CJS/ESM interop rationale
 // this repeats.
-export type { MatrixOption, MatrixCriterion, MatrixCell, MatrixBody, MatrixSpec } from "./spec.js";
+export type {
+  MatrixOption,
+  MatrixCriterion,
+  MatrixCell,
+  MatrixBody,
+  MatrixSpec,
+} from "./spec.js";
 export { MatrixBodySchema, MatrixSpecSchema } from "./spec.js";
 
 export type { MatrixRenderOutcome } from "./render.js";

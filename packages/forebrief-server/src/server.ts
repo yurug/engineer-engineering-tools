@@ -12,13 +12,7 @@ import * as path from "node:path";
 import type { Server as NodeHttpServer } from "node:http";
 import type { Hono } from "hono";
 import { serve as serveHttp } from "@hono/node-server";
-import {
-  systemClock,
-  ulidGenerator,
-  AppError,
-  type Clock,
-  type IdGenerator,
-} from "@brief/shared";
+import { systemClock, ulidGenerator, AppError, type Clock, type IdGenerator } from "@brief/shared";
 import {
   resolveRepoRoot,
   generateTokens,

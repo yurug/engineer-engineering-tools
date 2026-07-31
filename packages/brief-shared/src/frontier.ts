@@ -30,7 +30,10 @@ export const FRONTIER_SOURCE_STATES: ReadonlySet<NodeState> = new Set([
 ]);
 
 /** States that SATISFY a prerequisite for something downstream. */
-export const MASTERED_STATES: ReadonlySet<NodeState> = new Set(["grasped", "demonstrated"]);
+export const MASTERED_STATES: ReadonlySet<NodeState> = new Set([
+  "grasped",
+  "demonstrated",
+]);
 
 /** The minimum a node must expose to be placed in the graph. Structural on
  *  purpose: each tool has its own richer node type, and neither should have

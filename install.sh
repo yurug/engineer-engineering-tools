@@ -44,7 +44,11 @@ fi
 # the same library, and building only part of a project-references graph is more
 # trouble than it saves.
 echo "==> installing dependencies"
-npm install --silent
+# The distribution carries a lockfile, so installation must reproduce it rather
+# than silently rewriting dependency choices. None of the suite's dependencies
+# needs an install hook; refusing lifecycle scripts narrows the clone-and-run
+# trust boundary before our own explicit build starts.
+npm ci --ignore-scripts
 
 echo "==> building"
 npm run build --silent
@@ -61,7 +65,7 @@ done
 # --- skills ------------------------------------------------------------------
 # A tool's Claude skill is part of the tool. Symlinked rather than copied, so a
 # `git pull` here updates the installed skill too.
-SKILLS_DIR="$HOME/.claude/skills"
+SKILLS_DIR="${EET_SKILLS_DIR:-$HOME/.claude/skills}"
 if [ -d skills ]; then
   mkdir -p "$SKILLS_DIR"
   for s in skills/*; do

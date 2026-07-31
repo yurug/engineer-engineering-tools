@@ -38,7 +38,11 @@ export async function validateCodeCitation(
 ): Promise<CitationValidationResult> {
   const content = await repo.readAtRev(citation.rev, citation.path);
   if (content === null) {
-    return { citation, state: "broken", reason: `not found: ${citation.path}@${citation.rev}` };
+    return {
+      citation,
+      state: "broken",
+      reason: `not found: ${citation.path}@${citation.rev}`,
+    };
   }
   const lines = splitRealLines(content);
   if (citation.startLine < 1 || citation.endLine > lines.length) {
@@ -59,12 +63,20 @@ export async function validateCodeCitation(
   });
   if (repaired) {
     return {
-      citation: { ...citation, startLine: repaired.startLine, endLine: repaired.endLine },
+      citation: {
+        ...citation,
+        startLine: repaired.startLine,
+        endLine: repaired.endLine,
+      },
       state: "drifted",
       reason: `content moved from ${citation.startLine}-${citation.endLine} to ${repaired.startLine}-${repaired.endLine}`,
     };
   }
-  return { citation, state: "broken", reason: "content changed; no unique relocation found" };
+  return {
+    citation,
+    state: "broken",
+    reason: "content changed; no unique relocation found",
+  };
 }
 
 /**
@@ -77,7 +89,11 @@ export async function validateKbCitation(
 ): Promise<CitationValidationResult> {
   const content = await kb.readFile(citation.path);
   if (content === null) {
-    return { citation, state: "broken", reason: `KB file not found: ${citation.path}` };
+    return {
+      citation,
+      state: "broken",
+      reason: `KB file not found: ${citation.path}`,
+    };
   }
   const resolves = isPropertyIdAnchor(citation.anchor)
     ? declaresPropertyId(content, citation.anchor)

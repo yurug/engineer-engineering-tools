@@ -20,7 +20,10 @@ export interface LockInfo {
 const LOCK_RELATIVE_PATH = "server.lock";
 
 /** @returns the current lock's contents, or null if no lock file exists. */
-export async function readLock(repoRoot: string, stateDirName: string): Promise<LockInfo | null> {
+export async function readLock(
+  repoRoot: string,
+  stateDirName: string,
+): Promise<LockInfo | null> {
   try {
     const raw = await fs.readFile(
       resolveStateDirPath(repoRoot, stateDirName, LOCK_RELATIVE_PATH),
@@ -42,13 +45,22 @@ export async function writeLock(
   stateDirName: string,
   info: LockInfo,
 ): Promise<void> {
-  const lockPath = resolveStateDirPath(repoRoot, stateDirName, LOCK_RELATIVE_PATH);
+  const lockPath = resolveStateDirPath(
+    repoRoot,
+    stateDirName,
+    LOCK_RELATIVE_PATH,
+  );
   await fs.mkdir(path.dirname(lockPath), { recursive: true });
   await fs.writeFile(lockPath, JSON.stringify(info, null, 2) + "\n", "utf8");
 }
 
-export async function removeLock(repoRoot: string, stateDirName: string): Promise<void> {
-  await fs.rm(resolveStateDirPath(repoRoot, stateDirName, LOCK_RELATIVE_PATH), { force: true });
+export async function removeLock(
+  repoRoot: string,
+  stateDirName: string,
+): Promise<void> {
+  await fs.rm(resolveStateDirPath(repoRoot, stateDirName, LOCK_RELATIVE_PATH), {
+    force: true,
+  });
 }
 
 /**
@@ -70,5 +82,10 @@ export function isPidAlive(pid: number): boolean {
 }
 
 function isEnoent(error: unknown): boolean {
-  return typeof error === "object" && error !== null && "code" in error && error.code === "ENOENT";
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === "ENOENT"
+  );
 }

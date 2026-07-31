@@ -39,7 +39,8 @@ export const PRIMITIVES_SCHEMA_VERSION = "0.3.0";
  * refreshed. Must be updated in the same commit as any change to the
  * script's location or invocation.
  */
-export const PRIMITIVES_REFRESH_COMMAND = "../backbrief/tools/refresh-primitives.sh";
+export const PRIMITIVES_REFRESH_COMMAND =
+  "../backbrief/tools/refresh-primitives.sh";
 
 /** The shape a renderer needs to decide skew -- never thrown, because
  *  skew renders a banner (PR5), not a validation failure. */

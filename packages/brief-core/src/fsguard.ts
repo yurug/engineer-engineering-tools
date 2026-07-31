@@ -56,7 +56,9 @@ export function resolveRepoPath(repoRoot: string, relPath: string): string {
     // Traversal attempts are logged here -- the one place that can see
     // every attempt, by construction.
     console.warn(`[fsguard] path traversal attempt blocked: ${relPath}`);
-    throw new AppError("E_NOT_FOUND", `path is outside the repo: ${relPath}`, { path: relPath });
+    throw new AppError("E_NOT_FOUND", `path is outside the repo: ${relPath}`, {
+      path: relPath,
+    });
   }
   return resolved;
 }
@@ -92,9 +94,13 @@ export function resolveStateDirPath(
   const stateRoot = path.resolve(repoRoot, stateDirName);
   const resolved = path.resolve(stateRoot, relPath);
   if (resolved !== stateRoot && !resolved.startsWith(stateRoot + path.sep)) {
-    throw new AppError("E_INTERNAL", `refusing to write outside ${stateDirName}/: ${relPath}`, {
-      path: relPath,
-    });
+    throw new AppError(
+      "E_INTERNAL",
+      `refusing to write outside ${stateDirName}/: ${relPath}`,
+      {
+        path: relPath,
+      },
+    );
   }
   const realStateRoot = realpathOfNearestExistingAncestor(stateRoot);
   const realResolvedAncestor = realpathOfNearestExistingAncestor(resolved);
@@ -120,7 +126,11 @@ export function resolveStateDirPath(
  * and return it to anyone holding the weaker human token. This is the
  * full-path check for an endpoint that receives a complete path directly.
  */
-export function isUnderStateDir(repoRoot: string, stateDirName: string, relPath: string): boolean {
+export function isUnderStateDir(
+  repoRoot: string,
+  stateDirName: string,
+  relPath: string,
+): boolean {
   const stateRoot = path.resolve(repoRoot, stateDirName);
   const resolved = path.resolve(repoRoot, relPath);
   return resolved === stateRoot || resolved.startsWith(stateRoot + path.sep);

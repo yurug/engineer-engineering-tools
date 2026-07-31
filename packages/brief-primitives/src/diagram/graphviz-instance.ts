@@ -60,7 +60,10 @@ function loadGraphviz(): Promise<Graphviz> {
  *   version string, no timestamp, so two calls with the same arguments
  *   produce byte-identical output.
  */
-export async function layoutDot(dot: string, engine: GraphvizEngine): Promise<string> {
+export async function layoutDot(
+  dot: string,
+  engine: GraphvizEngine,
+): Promise<string> {
   const graphviz = await loadGraphviz();
   return graphviz.layout(dot, "svg", engine);
 }

@@ -23,13 +23,19 @@ const GIT_TIMEOUT_MS = 10_000;
  * @invariant matches plain `git`'s own behavior: `--repo`/`--cwd` may name
  *   any subdirectory, and the state dir always lands at the true top level
  */
-export async function resolveRepoRoot(candidate: string): Promise<string | null> {
+export async function resolveRepoRoot(
+  candidate: string,
+): Promise<string | null> {
   try {
-    const { stdout } = await execFileAsync("git", ["rev-parse", "--show-toplevel"], {
-      cwd: candidate,
-      env: { ...process.env, LC_ALL: "C" }, // git localizes some plumbing output -- pin the locale so parsing stays stable
-      timeout: GIT_TIMEOUT_MS,
-    });
+    const { stdout } = await execFileAsync(
+      "git",
+      ["rev-parse", "--show-toplevel"],
+      {
+        cwd: candidate,
+        env: { ...process.env, LC_ALL: "C" }, // git localizes some plumbing output -- pin the locale so parsing stays stable
+        timeout: GIT_TIMEOUT_MS,
+      },
+    );
     return stdout.trim();
   } catch {
     return null;

@@ -12,7 +12,10 @@ export type ChartRow = Record<string, ChartCellValue>;
  *   `field` entirely are skipped rather than contributing an `undefined`
  *   "value".
  */
-export function distinctFieldValues(rows: readonly ChartRow[], field: string): ChartCellValue[] {
+export function distinctFieldValues(
+  rows: readonly ChartRow[],
+  field: string,
+): ChartCellValue[] {
   const seen = new Set<ChartCellValue>();
   for (const row of rows) {
     const value = row[field];

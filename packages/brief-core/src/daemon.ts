@@ -43,7 +43,8 @@ export interface DaemonizeOptions {
   pollIntervalMs?: number;
 }
 
-export type DaemonizeResult = { ok: true; info: ServerInfo } | { ok: false; message: string };
+export type DaemonizeResult =
+  { ok: true; info: ServerInfo } | { ok: false; message: string };
 
 /**
  * Spawns the daemon entry as a detached child, then polls for either
@@ -53,7 +54,9 @@ export type DaemonizeResult = { ok: true; info: ServerInfo } | { ok: false; mess
  * @invariant surfaces a startup failure (E_ALREADY_RUNNING, a bad repo,
  *   etc.) to the caller promptly instead of a silent multi-second hang
  */
-export async function daemonizeAndAwaitReady(opts: DaemonizeOptions): Promise<DaemonizeResult> {
+export async function daemonizeAndAwaitReady(
+  opts: DaemonizeOptions,
+): Promise<DaemonizeResult> {
   const stateDir = path.join(opts.repoRoot, opts.stateDirName);
   await fsp.mkdir(stateDir, { recursive: true });
   const errorFilePath = resolveStateDirPath(
@@ -67,7 +70,11 @@ export async function daemonizeAndAwaitReady(opts: DaemonizeOptions): Promise<Da
   return waitForReadyOrError(opts, errorFilePath, childPid);
 }
 
-function spawnDetached(daemonEntryPath: string, args: string[], stateDir: string): number {
+function spawnDetached(
+  daemonEntryPath: string,
+  args: string[],
+  stateDir: string,
+): number {
   const logFd = fs.openSync(path.join(stateDir, "server.log"), "a");
   // `detached: true` + `unref()` is what makes this "daemonize": the child
   // gets its own process group and the calling command can exit without
@@ -78,7 +85,8 @@ function spawnDetached(daemonEntryPath: string, args: string[], stateDir: string
   });
   fs.closeSync(logFd); // the child holds its own duplicate fd; this process no longer needs it
   child.unref();
-  if (child.pid === undefined) throw new Error("failed to spawn the daemon process");
+  if (child.pid === undefined)
+    throw new Error("failed to spawn the daemon process");
   return child.pid;
 }
 
@@ -102,7 +110,9 @@ async function waitForReadyOrError(
   };
 }
 
-async function readAndConsumeErrorFile(errorFilePath: string): Promise<string | null> {
+async function readAndConsumeErrorFile(
+  errorFilePath: string,
+): Promise<string | null> {
   try {
     const raw = await fsp.readFile(errorFilePath, "utf8");
     await fsp.rm(errorFilePath, { force: true });
@@ -129,6 +139,10 @@ export async function writeServeErrorSentinel(
   code: string,
   message: string,
 ): Promise<void> {
-  const filePath = resolveStateDirPath(repoRoot, stateDirName, SERVE_ERROR_RELATIVE_PATH);
+  const filePath = resolveStateDirPath(
+    repoRoot,
+    stateDirName,
+    SERVE_ERROR_RELATIVE_PATH,
+  );
   await fsp.writeFile(filePath, JSON.stringify({ code, message }), "utf8");
 }

@@ -16,7 +16,8 @@ import type { FilmstripStep } from "./spec.js";
 // block per element, each starting with a <title> naming it
 // (https://graphviz.org/doc/info/output.html#d:svg) -- non-nested, so a
 // non-greedy match up to the first </g> is exactly one element's block.
-const ELEMENT_BLOCK_RE = /<g id="(?:node|edge)\d+" class="(?:node|edge)">([\s\S]*?)<\/g>/g;
+const ELEMENT_BLOCK_RE =
+  /<g id="(?:node|edge)\d+" class="(?:node|edge)">([\s\S]*?)<\/g>/g;
 
 function decodeGraphvizTitle(raw: string): string {
   return raw
@@ -39,7 +40,11 @@ function titleOf(blockContent: string): string | null {
  *  of whether it's also absent from `emphasize`. */
 function elementStyle(id: string, step: FilmstripStep): string | null {
   if (step.show && !step.show.includes(id)) return "display:none";
-  if (step.emphasize && step.emphasize.length > 0 && !step.emphasize.includes(id)) {
+  if (
+    step.emphasize &&
+    step.emphasize.length > 0 &&
+    !step.emphasize.includes(id)
+  ) {
     return `opacity:${String(TOKENS.opacity.dimmed)}`;
   }
   return null;
@@ -73,15 +78,19 @@ export function renderFilmstripStep(
   step: FilmstripStep,
   textForId: ReadonlyMap<string, string>,
 ): string {
-  return pinnedSvg.replace(ELEMENT_BLOCK_RE, (whole: string, content: string) => {
-    const id = titleOf(content);
-    if (id === null) return whole;
-    const style = elementStyle(id, step);
-    const openTagEnd = whole.indexOf(">");
-    const openTag = whole.slice(0, openTagEnd);
-    const styledOpenTag = style ? `${openTag} style="${style}"` : openTag;
-    const newText = textForId.get(id);
-    const newContent = newText === undefined ? content : withRelabeledText(content, newText);
-    return `${styledOpenTag}>${newContent}</g>`;
-  });
+  return pinnedSvg.replace(
+    ELEMENT_BLOCK_RE,
+    (whole: string, content: string) => {
+      const id = titleOf(content);
+      if (id === null) return whole;
+      const style = elementStyle(id, step);
+      const openTagEnd = whole.indexOf(">");
+      const openTag = whole.slice(0, openTagEnd);
+      const styledOpenTag = style ? `${openTag} style="${style}"` : openTag;
+      const newText = textForId.get(id);
+      const newContent =
+        newText === undefined ? content : withRelabeledText(content, newText);
+      return `${styledOpenTag}>${newContent}</g>`;
+    },
+  );
 }

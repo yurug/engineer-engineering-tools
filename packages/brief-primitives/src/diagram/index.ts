@@ -9,8 +9,18 @@
 // Key design decision: explicit named re-exports, NOT `export * from` --
 // see ../index.ts's header for the full Vite CJS/ESM interop rationale
 // this repeats.
-export type { DiagramMeaning, DiagramNode, DiagramEdge, DiagramBody, DiagramSpec } from "./spec.js";
-export { DiagramMeaningSchema, DiagramBodySchema, DiagramSpecSchema } from "./spec.js";
+export type {
+  DiagramMeaning,
+  DiagramNode,
+  DiagramEdge,
+  DiagramBody,
+  DiagramSpec,
+} from "./spec.js";
+export {
+  DiagramMeaningSchema,
+  DiagramBodySchema,
+  DiagramSpecSchema,
+} from "./spec.js";
 
 export type { GraphvizEngine } from "./engine-map.js";
 export { ENGINE_BY_MEANING } from "./engine-map.js";

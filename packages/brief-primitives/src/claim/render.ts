@@ -27,8 +27,16 @@ import { renderSkewBanner } from "../skew-banner.js";
 import { PrimitiveSchemaError } from "../schema-error.js";
 import { TOKENS } from "../tokens.js";
 import type { Trust } from "../envelope.js";
-import { ClaimSpecSchema, type ClaimSpec, type EvidenceEnvelope } from "./spec.js";
-import { renderEvidence, prefixIssuesWithEvidence, evidenceDrawsOwnChrome } from "./dispatch.js";
+import {
+  ClaimSpecSchema,
+  type ClaimSpec,
+  type EvidenceEnvelope,
+} from "./spec.js";
+import {
+  renderEvidence,
+  prefixIssuesWithEvidence,
+  evidenceDrawsOwnChrome,
+} from "./dispatch.js";
 import { escapeHtmlText } from "./html-utils.js";
 
 export type ClaimRenderOutcome =
@@ -61,7 +69,11 @@ function evidenceTrustOf(evidence: EvidenceEnvelope): Trust {
  *   field (the same composition trust every primitive-to-primitive
  *   embedding in this package relies on).
  */
-function renderClaimCard(spec: ClaimSpec, evidenceMarkup: string, trust: Trust): string {
+function renderClaimCard(
+  spec: ClaimSpec,
+  evidenceMarkup: string,
+  trust: Trust,
+): string {
   const isConjecture = trust === "conjecture";
   const frameColor = isConjecture ? TOKENS.color.conjecture : TOKENS.color.ink;
   const frameStyle = [
@@ -124,13 +136,17 @@ export async function renderClaim(raw: unknown): Promise<ClaimRenderOutcome> {
   const specVersion = versionOf(raw);
   if (specVersion !== undefined) {
     const versionCheck = checkSchemaVersion(specVersion);
-    if (!versionCheck.ok) return { status: "skew", html: renderSkewBanner(versionCheck) };
+    if (!versionCheck.ok)
+      return { status: "skew", html: renderSkewBanner(versionCheck) };
   }
   const parsed = ClaimSpecSchema.safeParse(raw);
   if (!parsed.success) {
     return {
       status: "invalid",
-      error: new PrimitiveSchemaError("malformed claim spec", parsed.error.issues),
+      error: new PrimitiveSchemaError(
+        "malformed claim spec",
+        parsed.error.issues,
+      ),
     };
   }
   const spec = parsed.data;
@@ -141,7 +157,11 @@ export async function renderClaim(raw: unknown): Promise<ClaimRenderOutcome> {
   // garbage trust value can only ever affect markup that is discarded.
   const trust = weakestOf(spec.trust, evidenceTrustOf(spec.evidence));
   const evidenceResult = await renderEvidence(spec.evidence, {
-    chrome: evidenceDrawsOwnChrome(spec.evidence.kind, evidenceTrustOf(spec.evidence), trust),
+    chrome: evidenceDrawsOwnChrome(
+      spec.evidence.kind,
+      evidenceTrustOf(spec.evidence),
+      trust,
+    ),
   });
   if (!evidenceResult.ok) {
     return {
@@ -152,5 +172,8 @@ export async function renderClaim(raw: unknown): Promise<ClaimRenderOutcome> {
       ),
     };
   }
-  return { status: "ok", html: renderClaimCard(spec, evidenceResult.value.markup, trust) };
+  return {
+    status: "ok",
+    html: renderClaimCard(spec, evidenceResult.value.markup, trust),
+  };
 }
