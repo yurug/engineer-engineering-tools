@@ -39,6 +39,12 @@ export interface GroundedNode {
   mode: NodeMode;
   question: string;
   answer: string;
+  visual:
+    | { kind: "diagram"; spec: unknown; svg: string }
+    | { kind: "filmstrip"; spec: unknown; steps: { caption: string; svg: string }[] }
+    | { kind: "invalid"; spec: unknown; error: string };
+  introduces?: string[];
+  uses?: string[];
   grounding: Grounding[];
 }
 

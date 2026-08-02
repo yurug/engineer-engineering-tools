@@ -29,9 +29,10 @@ export type GraphvizEngine = "dot" | "neato" | "fdp" | "twopi";
  *   worse on that common case.
  * - `dependency` -> `dot`: a dependency graph is a DAG in the common case;
  *   rank-based layout communicates "what depends on what" directly.
- * - `concept-map` -> `neato`: concept maps are not inherently hierarchical;
- *   `neato`'s spring-model layout groups related concepts spatially
- *   instead of forcing a top-down rank order that doesn't exist.
+ * - `concept-map` -> `dot`: the first browser adoption showed that `neato`
+ *   places small labelled maps unpredictably: edge labels collide with nodes
+ *   and reading order disappears. Teaching maps express directed relations,
+ *   so stable ranks are more useful than force-directed proximity.
  * - `causal-chain` -> `dot`: a chain of causes and effects is a straight
  *   line; `dot` with `rankdir=LR` (./dot.ts) renders it left-to-right.
  */
@@ -39,6 +40,6 @@ export const ENGINE_BY_MEANING: Record<DiagramMeaning, GraphvizEngine> = {
   flow: "dot",
   "state-machine": "dot",
   dependency: "dot",
-  "concept-map": "neato",
+  "concept-map": "dot",
   "causal-chain": "dot",
 };

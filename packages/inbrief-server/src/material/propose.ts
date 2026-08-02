@@ -43,6 +43,8 @@ function render(node: StoredNode): string {
     `mode: ${node.mode}`,
     `question: ${node.question}`,
     `requires: [${node.requires.join(", ")}]`,
+    `introduces: [${node.introduces.join(", ")}]`,
+    `uses: [${node.uses.join(", ")}]`,
     // Written explicitly even though only durable nodes are proposed: a file
     // that does not say would read back as a snapshot, so the round trip would
     // silently demote it.
@@ -53,7 +55,15 @@ function render(node: StoredNode): string {
   }
   lines.push("citations:");
   for (const citation of node.citations) lines.push(`  - ${reference(citation)}`);
-  lines.push("---", node.answer, "");
+  lines.push(
+    "---",
+    "```visual",
+    JSON.stringify(node.visual.spec, null, 2),
+    "```",
+    "",
+    node.answer,
+    "",
+  );
   return lines.join("\n");
 }
 

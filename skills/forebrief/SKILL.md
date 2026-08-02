@@ -19,12 +19,9 @@ this file. Never half-apply this skill.
 ## Read the wire reference before posting
 
 Card and record shapes are forebrief's fixed public protocol. Before the first
-`post` or `act`, read `../../docs/forebrief-data-model.md` and
-`../../docs/forebrief-cli.md` next to this installed skill. In a development
-checkout where those public files are absent, read forebrief's
-`kb/spec/data-model.md`, `kb/spec/cli-contract.md`, and
-`kb/spec/config-and-formats.md`. Never guess fields and use `E_SCHEMA` as
-documentation.
+`post` or `act`, read [references/data-model.md](references/data-model.md) and
+[references/cli.md](references/cli.md) in full. Never guess fields or use an
+`E_SCHEMA` rejection as documentation.
 
 ## The eight commands
 

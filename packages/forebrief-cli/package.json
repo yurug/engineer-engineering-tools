@@ -1,6 +1,6 @@
 {
   "name": "@forebrief/cli",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "forebrief CLI -- a thin, stateless HTTP client of the local forebrief server (ADR-001).",
   "main": "dist/index.js",

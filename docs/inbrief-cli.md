@@ -30,9 +30,11 @@ mints and validates them.
     "id": "append-only-recovery",
     "mode": "explanation",
     "question": "How does restart recovery work?",
-    "answer": "The log is replayed in order; a torn final record is ignored.",
+    "answer": "The event log is replayed in order; a torn final record is ignored.",
     "citations": [{ "kind": "code", "path": "src/log.ts", "startLine": 20, "endLine": 45 }],
     "requires": [],
+    "introduces": ["event log"],
+    "uses": [],
     "lifetime": "durable"
   }
 }

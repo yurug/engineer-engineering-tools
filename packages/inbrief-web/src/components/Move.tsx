@@ -49,7 +49,18 @@ export function Move({
         {node.mode}
       </p>
       <h1 className="question">{node.question}</h1>
+      {node.visual && <NodeVisual visual={node.visual} />}
       <p className="answer">{node.answer}</p>
+      {(node.introduces?.length ?? 0) > 0 && (
+        <p className="vocabulary" data-testid="vocabulary-introduced">
+          New vocabulary: {node.introduces?.join(", ")}
+        </p>
+      )}
+      {(node.uses?.length ?? 0) > 0 && (
+        <p className="vocabulary" data-testid="vocabulary-used">
+          Builds on: {node.uses?.join(", ")}
+        </p>
+      )}
 
       <ul className="grounding" data-testid="grounding">
         {node.grounding.map((g, i) => (
@@ -76,6 +87,45 @@ export function Move({
         {SAID[mastery]}
       </p>
     </article>
+  );
+}
+
+function NodeVisual({ visual }: { visual: GroundedNode["visual"] }): React.JSX.Element {
+  const [step, setStep] = useState(0);
+  if (visual.kind === "invalid") {
+    return <p className="visual-error">Visual unavailable: {visual.error}</p>;
+  }
+  if (visual.kind === "diagram") {
+    return (
+      <figure
+        className="visual primitive-diagram"
+        data-testid="visual"
+        dangerouslySetInnerHTML={{ __html: visual.svg }}
+      />
+    );
+  }
+  const at = Math.min(step, visual.steps.length - 1);
+  const frame = visual.steps[at];
+  return (
+    <figure className="visual primitive-filmstrip" data-testid="visual">
+      <div dangerouslySetInnerHTML={{ __html: frame?.svg ?? "" }} />
+      <figcaption>{frame?.caption}</figcaption>
+      <div className="visual-controls">
+        <button type="button" disabled={at === 0} onClick={() => setStep(at - 1)}>
+          ‹ step
+        </button>
+        <span>
+          step {at + 1} / {visual.steps.length}
+        </span>
+        <button
+          type="button"
+          disabled={at >= visual.steps.length - 1}
+          onClick={() => setStep(at + 1)}
+        >
+          step ›
+        </button>
+      </div>
+    </figure>
   );
 }
 

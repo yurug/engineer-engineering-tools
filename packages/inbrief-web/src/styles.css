@@ -1,6 +1,5 @@
-/* Deliberately plain. Step 1 is about whether the session works, and a visual
-   language is its own decision nobody has made yet. The one thing carrying real
-   weight is that .conjecture cannot be mistaken for .grounded (P1). */
+/* Quiet interface; explanatory visuals carry structure, while conjectures remain
+   impossible to mistake for grounded claims. */
 :root {
   --fg: #1a1a1a;
   --muted: #666;
@@ -33,6 +32,41 @@ body {
 }
 .answer {
   font-size: 1.125rem;
+}
+.visual {
+  margin: 1.25rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  background: #f7f9fc;
+}
+.visual svg {
+  display: block;
+  width: auto;
+  margin-inline: auto;
+  height: auto;
+  /* Do not enlarge small diagrams: scaling 12pt labels to poster size
+     amplifies every layout weakness without adding information. */
+  max-height: 24rem;
+  max-width: 100%;
+}
+.visual-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+.visual-error {
+  padding: 0.75rem;
+  color: var(--warn);
+  background: #fff6ef;
+  border-left: 3px solid var(--warn);
+}
+.visual figcaption {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.85rem;
 }
 .grounding {
   list-style: none;
@@ -177,9 +211,7 @@ body {
   color: var(--warn);
 }
 
-/* One button rule across the session, so the controls do not look assembled from
-   three different afternoons. A visual language is still undecided; this is only
-   the absence of one being consistent. */
+/* One button rule across the session, so controls form one visual language. */
 .claims button,
 .session-nav button,
 .question-box button {

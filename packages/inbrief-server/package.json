@@ -1,6 +1,6 @@
 {
   "name": "@inbrief/server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@brief/core": "*",
+    "@brief/primitives": "*",
     "@brief/shared": "*",
     "@hono/node-server": "^2.0.12",
     "hono": "^4.12.32",

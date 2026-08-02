@@ -15,6 +15,8 @@
 import { makeCitationMinter, validateCodeCitation, type CitationRepoAccess } from "@brief/core";
 import type { Citation } from "@brief/shared";
 import { validateRequires } from "./requires";
+import { validateTerminology } from "./terminology";
+import { renderVisual } from "./render-visual";
 import {
   ANSWER_WORD_BUDGET,
   NODE_MODES,
@@ -45,17 +47,40 @@ export async function intakeNode(
   repo: CitationRepoAccess,
   existing: readonly StoredNode[] = [],
 ): Promise<IntakeResult> {
-  const refusals: Refusal[] = [...validateRequires(submission, existing)];
+  const refusals: Refusal[] = [
+    ...validateRequires(submission, existing),
+    ...validateTerminology(submission, existing),
+  ];
 
   if (submission.citations.length === 0) refusals.push("no-citation");
   if (countWords(submission.answer) > ANSWER_WORD_BUDGET) refusals.push("answer-over-budget");
   if (countWords(submission.question) > QUESTION_WORD_BUDGET) refusals.push("question-over-budget");
+  if (!hasVisual(submission)) refusals.push("visual-missing");
   if (!isTaughtMode(submission.mode)) refusals.push("mode-out-of-scope");
 
   const minted = await mintAndValidate(submission, repo);
   if (minted.some((m) => m.state !== "valid")) refusals.push("citation-unresolved");
 
-  const node: StoredNode = { ...submission, citations: minted.map((m) => m.citation) };
+  const visual = hasVisual(submission)
+    ? await renderVisual(submission.visual)
+    : { kind: "invalid" as const, spec: { kind: "missing" }, error: "visual missing" };
+  if (visual.kind === "invalid" && hasVisual(submission)) {
+    refusals.push(`visual-invalid:${visual.error}`);
+  }
+
+  const node: StoredNode = {
+    id: submission.id,
+    mode: submission.mode,
+    question: submission.question,
+    answer: submission.answer,
+    visual,
+    citations: minted.map((m) => m.citation),
+    requires: submission.requires,
+    introduces: submission.introduces,
+    uses: submission.uses,
+    ...(submission.portableConcept ? { portableConcept: submission.portableConcept } : {}),
+    ...(submission.lifetime ? { lifetime: submission.lifetime } : {}),
+  };
   return {
     admitted: refusals.length === 0,
     node,
@@ -64,6 +89,11 @@ export async function intakeNode(
     ),
     refusals,
   };
+}
+
+function hasVisual(submission: NodeSubmission): boolean {
+  const visual = submission.visual as NodeSubmission["visual"] | undefined;
+  return Boolean(visual && typeof visual === "object" && visual.kind.trim());
 }
 
 /**

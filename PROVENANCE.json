@@ -1,9 +1,18 @@
 {
+  "version": "0.2.0",
   "publishedFrom": {
-    "brief": "private",
-    "backbrief": "private",
-    "forebrief": "private",
-    "inbrief": "private"
+    "brief": {
+      "revision": "6da09dd20c6a9e2799318eb50f6fcb28664a2d71"
+    },
+    "backbrief": {
+      "revision": "fde3d23e03eb7ca11b38a19cd0082352cfafd8f2"
+    },
+    "forebrief": {
+      "revision": "8ecc0110345c5ae3efe84692630e8778a7503e39"
+    },
+    "inbrief": {
+      "revision": "33fcab664bdf347ac415bb75a44e075ce20c0ed9"
+    }
   },
   "packages": [
     "brief-shared",

@@ -72,6 +72,18 @@ export type Lifetime = "durable" | "snapshot";
  */
 export const DEFAULT_LIFETIME: Lifetime = "snapshot";
 
+/** Minimal wire gate; @brief/primitives performs the authoritative validation. */
+export interface VisualSubmission {
+  kind: string;
+  [field: string]: unknown;
+}
+
+/** Rendered only from a validated primitive spec, never from submitted markup. */
+export type StoredVisual =
+  | { kind: "diagram"; spec: VisualSubmission; svg: string }
+  | { kind: "filmstrip"; spec: VisualSubmission; steps: { caption: string; svg: string }[] }
+  | { kind: "invalid"; spec: VisualSubmission; error: string };
+
 /** What an agent submits. Carries no rev, no hash, and no verdict: those are the server's. */
 export interface NodeSubmission {
   /** Stable slug, chosen by the agent, never reused for a different claim. */
@@ -81,6 +93,8 @@ export interface NodeSubmission {
   question: string;
   /** The claim, at most ANSWER_WORD_BUDGET words. */
   answer: string;
+  /** The visual device promised by the definition of a Move (GLOSSARY). */
+  visual: VisualSubmission;
   /** At least one. P1 admits nothing ungrounded. */
   citations: CitationInput[];
   /**
@@ -91,6 +105,10 @@ export interface NodeSubmission {
    * the same value, and the fringe computation cannot tell them apart either.
    */
   requires: string[];
+  /** Terms this answer defines from vocabulary its prerequisites already established (P9). */
+  introduces: string[];
+  /** Terms this question or answer assumes the engineer already understands (P9). */
+  uses: string[];
   /**
    * The laconic concept this node teaches, when it teaches one that TRAVELS.
    *
@@ -110,8 +128,9 @@ export interface NodeSubmission {
 }
 
 /** A submission after the server has minted its citations. */
-export interface StoredNode extends Omit<NodeSubmission, "citations"> {
+export interface StoredNode extends Omit<NodeSubmission, "citations" | "visual"> {
   citations: Citation[];
+  visual: StoredVisual;
 }
 
 /** Why a node was refused. Every value is a KB line, not a style preference. */
@@ -119,8 +138,15 @@ export type Refusal =
   | "no-citation" // P1
   | "answer-over-budget" // P5 + the glossary's thirty words
   | "question-over-budget" // P5 + the glossary's twelve words (ADR-011)
+  | "visual-missing" // P10 + glossary: a Move contains one explanatory visual
+  | `visual-invalid:${string}` // P10: @brief/primitives rejected the spec
   | "requires-unknown-node" // ADR-005: waits on something that does not exist
   | "requires-cycle" // ADR-005: waits, transitively, on itself
+  | "vocabulary-metadata-missing" // P9: omission is not an empty vocabulary
+  | `term-unintroduced:${string}` // P9: no transitive prerequisite introduces it
+  | `introduced-term-in-question:${string}` // P9: a question cannot assume its new term
+  | `introduced-term-missing-from-answer:${string}` // P9: metadata cannot claim a silent introduction
+  | `used-term-missing-from-node:${string}` // P9: unused declarations obscure the real vocabulary
   | "mode-out-of-scope" // ADR-006
   | "citation-unresolved"; // P1
 

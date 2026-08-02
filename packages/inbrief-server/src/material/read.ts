@@ -82,10 +82,23 @@ function parseNode(content: string): NodeSubmission | null {
   const id = field("id");
   const question = field("question");
   const mode = field("mode");
-  const answer = (body ?? "").trim();
+  const parsedBody = parseBody(body ?? "");
+  const answer = parsedBody.answer;
   const citations = parseCitations(frontmatter ?? "");
+  const introduces = field("introduces");
+  const uses = field("uses");
 
-  if (!id || !question || !mode || answer === "" || citations.length === 0) return null;
+  if (
+    !id ||
+    !question ||
+    !mode ||
+    answer === "" ||
+    parsedBody.visual === null ||
+    citations.length === 0 ||
+    introduces === undefined ||
+    uses === undefined
+  )
+    return null;
   if (!(NODE_MODES as readonly string[]).includes(mode)) return null;
 
   const portable = field("portableConcept");
@@ -95,12 +108,34 @@ function parseNode(content: string): NodeSubmission | null {
     mode: mode as NodeMode,
     question,
     answer,
+    visual: parsedBody.visual,
     citations,
     requires: parseList(field("requires") ?? "[]"),
+    introduces: parseList(introduces),
+    uses: parseList(uses),
     // Absent means snapshot (DEFAULT_LIFETIME): an author who did not say has
     // not claimed this describes a design.
     lifetime: lifetime === "durable" ? "durable" : "snapshot",
     ...(portable ? { portableConcept: parsePortable(portable) } : {}),
+  };
+}
+
+/** A git-reviewable spatial model, placed before prose so structure comes first. */
+function parseBody(body: string): {
+  visual: NodeSubmission["visual"] | null;
+  answer: string;
+} {
+  const match = /^```visual\n([\s\S]*?)\n```\n+([\s\S]*)$/.exec(body.trim());
+  if (!match) return { visual: null, answer: body.trim() };
+  let visual: NodeSubmission["visual"];
+  try {
+    visual = JSON.parse(match[1]!) as NodeSubmission["visual"];
+  } catch {
+    return { visual: null, answer: match[2]!.trim() };
+  }
+  return {
+    visual,
+    answer: match[2]!.trim(),
   };
 }
 
