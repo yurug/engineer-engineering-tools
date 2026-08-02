@@ -32,6 +32,24 @@ the tools are designed to be used together; `./install.sh forebrief` installs on
 Requires Node >= 20. If the binaries do not land on your `PATH`, check that
 `npm config get prefix` names a directory that is on it.
 
+### Strongly recommended: install Laconic
+
+[Laconic](https://github.com/yurug/laconic-skill) supplies the persistent,
+project-independent model of what you already understand. Inbrief and Backbrief work
+without it, but they cannot carry demonstrated knowledge between projects or calibrate
+their explanations against that history.
+
+Install it as a Claude Code plugin for the complete, always-on integration:
+
+```text
+/plugin marketplace add https://github.com/yurug/laconic-skill
+/plugin install laconic@nomadic-labs
+```
+
+After starting a new Claude Code session, verify it with
+`~/.laconic/bin/laconic-status`. A bare-skill installation is also supported; see
+Laconic's README for the distinction.
+
 ## What is here
 
 | Package | What it is |

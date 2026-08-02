@@ -18,6 +18,7 @@ check() {
 
 check "distribution provenance matches the package tree" node tools/verify-distribution.mjs
 check "user-facing Markdown links resolve" node tools/verify-doc-links.mjs
+check "installer has valid POSIX shell syntax" sh -n install.sh
 check "workspace builds" npm run build
 
 if [ "$fail" -ne 0 ]; then

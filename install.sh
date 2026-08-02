@@ -99,6 +99,27 @@ for t in $TOOLS; do
   fi
 done
 
+LACONIC_HOME_DIR="${LACONIC_HOME:-$HOME/.laconic}"
+if [ -x "$LACONIC_HOME_DIR/bin/laconic-status" ]; then
+  printf '\n%s\n' "recommended companion detected: Laconic"
+  "$LACONIC_HOME_DIR/bin/laconic-status" || true
+else
+  cat <<'LACONIC'
+
+STRONGLY RECOMMENDED: install Laconic
+  Inbrief and Backbrief run without it, but demonstrated knowledge will not
+  carry between projects and explanations cannot be calibrated against that
+  history.
+
+  In Claude Code:
+    /plugin marketplace add https://github.com/yurug/laconic-skill
+    /plugin install laconic@nomadic-labs
+
+  Then start a new session and run ~/.laconic/bin/laconic-status.
+  Details: https://github.com/yurug/laconic-skill
+LACONIC
+fi
+
 cat <<'NOTE'
 
 Each tool wants a per-repo state directory before it does anything; see
