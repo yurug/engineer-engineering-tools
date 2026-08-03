@@ -98,12 +98,32 @@ backbrief serve [--repo DIR] [--focus diff:A..B|component:PATH|system] [--port N
     → {url, token, port, sessionId, pid} — ONE line, then it daemonizes.
 backbrief act FILE.json | act -   → posts one action; prints report;
       exit 0 valid, 2 flagged, 1 error/rejected.
-backbrief events [--since N] [--follow] [--timeout SECS]
+backbrief events [--since N] [--follow] [--timeout SECS] [--actor human]
     → prints Envelopes as JSONL, oldest first — your live signal.
 backbrief status / backbrief digest / backbrief stop
 ```
 
-Run `events --follow` as a background process; react to what arrives.
+## Response sentinel — mandatory while the browser is open
+
+Do not rely on a held background process waking the main agent. If the host
+supports subagents, launch one fast/low-cost subagent whose only job is the
+response inbox; otherwise run the same loop yourself:
+
+1. Keep `lastCommittedSeq` (start at `0`). Run `backbrief events --actor human
+--since <lastCommittedSeq> --follow --timeout 20` in the background.
+2. On output, read every envelope in `seq` order and relay it to the main agent
+   immediately. Human input preempts the next planned move.
+3. The main agent reacts before presenting anything else. For an action caused
+   by an envelope, use a deterministic `clientKey` derived from its `id`, so a
+   replay cannot duplicate the reaction.
+4. Advance `lastCommittedSeq` only after the reaction succeeds (or the main
+   agent explicitly acknowledges that no action is needed), then relaunch.
+
+The sentinel may classify and relay; it must never invent a human response,
+advance mastery, or settle `not-clear`/`thats-wrong` without the main agent.
+Before every `present_move`, session stop, and final answer, drain from
+`lastCommittedSeq` once more. A timeout with no output is not completion:
+relaunch while the browser session remains active.
 
 ## The citation rule
 

@@ -1,7 +1,7 @@
 {
   "name": "engineer-engineering-tools",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "backbrief, forebrief and inbrief — the tools an engineer uses to steer agentic development — and the library they share.",
   "workspaces": [
     "packages/*"

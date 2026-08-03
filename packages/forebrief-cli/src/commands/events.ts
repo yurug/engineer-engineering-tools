@@ -7,12 +7,15 @@ import { findLiveServer } from "../discovery";
 import { getText, eventsUrl, describeApiError } from "../http-client";
 import { EXIT_ERROR, EXIT_OK, type Io } from "../output";
 import type { ServerInfo } from "@forebrief/server";
+import type { Actor, Envelope } from "@brief/shared";
+import { pumpSseEvents } from "@brief/core";
 
 export interface EventsOptions {
   repoStartDir: string;
   since?: number;
   follow: boolean;
   timeoutSecs?: number;
+  actor?: Actor;
   io: Io;
 }
 
@@ -38,7 +41,11 @@ export async function runEventsCommand(opts: EventsOptions): Promise<number> {
       opts.io.writeErr(`forebrief: ${describeApiError(result.error)}`);
       return EXIT_ERROR;
     }
-    if (result.body.length > 0) opts.io.writeOut(result.body.replace(/\n$/, ""));
+    const lines = result.body.trim().length > 0 ? result.body.trim().split("\n") : [];
+    const selected = lines.filter(
+      (line) => opts.actor === undefined || (JSON.parse(line) as Envelope).actor === opts.actor,
+    );
+    if (selected.length > 0) opts.io.writeOut(selected.join("\n"));
     return EXIT_OK;
   }
 
@@ -69,7 +76,12 @@ async function followEvents(info: ServerInfo, opts: EventsOptions): Promise<numb
       opts.io.writeErr("forebrief: no response body from the follow endpoint");
       return EXIT_ERROR;
     }
-    await pumpSseEnvelopes(res.body, opts.io);
+    await pumpSseEvents(res.body, {
+      ...(opts.actor !== undefined ? { actor: opts.actor } : {}),
+      exitAfterFirstMatch: opts.timeoutSecs !== undefined,
+      writeEnvelope: (json) => opts.io.writeOut(json),
+    });
+    if (opts.timeoutSecs !== undefined) controller.abort();
     return EXIT_OK;
   } catch (error) {
     if (controller.signal.aborted) return EXIT_OK; // --timeout elapsed -- an ordinary, expected end
@@ -77,28 +89,5 @@ async function followEvents(info: ServerInfo, opts: EventsOptions): Promise<numb
     return EXIT_ERROR;
   } finally {
     if (timer) clearTimeout(timer);
-  }
-}
-
-/** Decodes hono's SSE wire format, forwarding only `event: envelope` frames as one JSON line each. */
-async function pumpSseEnvelopes(body: ReadableStream<Uint8Array>, io: Io): Promise<void> {
-  let buffer = "";
-  for await (const chunk of body) {
-    buffer += Buffer.from(chunk).toString("utf8");
-    let boundary: number;
-    while ((boundary = buffer.indexOf("\n\n")) !== -1) {
-      const block = buffer.slice(0, boundary);
-      buffer = buffer.slice(boundary + 2);
-      emitIfEnvelope(block, io);
-    }
-  }
-}
-
-function emitIfEnvelope(block: string, io: Io): void {
-  const lines = block.split("\n");
-  const eventLine = lines.find((l) => l.startsWith("event: "));
-  const dataLine = lines.find((l) => l.startsWith("data: "));
-  if (eventLine?.slice("event: ".length) === "envelope" && dataLine) {
-    io.writeOut(dataLine.slice("data: ".length));
   }
 }

@@ -4,6 +4,7 @@
 // kb/spec/cli-contract.md: the eight documented commands (serve, status,
 // stop, post, act, events, digest, fold -- fold added plan step 4).
 import * as path from "node:path";
+import type { Actor } from "@brief/shared";
 import { extractFlag, hasFlag } from "../args";
 import { processIo } from "../output";
 import { runServeCommand } from "../commands/serve";
@@ -58,6 +59,9 @@ async function main(): Promise<number> {
         io: processIo,
         ...(since !== undefined ? { since } : {}),
         ...(timeoutSecs !== undefined ? { timeoutSecs } : {}),
+        ...(extractFlag(rest, "--actor") !== undefined
+          ? { actor: actorFlag(rest, "--actor") }
+          : {}),
       });
     }
     case "digest":
@@ -85,6 +89,12 @@ async function main(): Promise<number> {
 function numberFlag(argv: readonly string[], name: string): number | undefined {
   const raw = extractFlag(argv, name);
   return raw === undefined ? undefined : Number(raw);
+}
+
+function actorFlag(argv: readonly string[], name: string): Actor {
+  const value = extractFlag(argv, name);
+  if (value === "agent" || value === "human" || value === "system") return value;
+  throw new Error(`${name} must be agent, human, or system`);
 }
 
 /** @returns the `FILE.json | -` positional argument, or undefined (with an stderr message already written) if it's missing. */

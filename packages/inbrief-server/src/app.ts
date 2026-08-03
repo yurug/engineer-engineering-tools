@@ -14,7 +14,9 @@ import {
   type CitationRepoAccess,
   type HttpStatus,
   type PresenceSink,
+  type EventStore,
   type Tokens,
+  followEventsRoute,
 } from "@brief/core";
 import { AppError } from "@brief/shared";
 import { intakeNode } from "./nodes/intake";
@@ -40,6 +42,7 @@ type Env = { Variables: { actor: "agent" | "human" } };
 export interface AppDeps {
   tokens: Tokens;
   session: Session;
+  eventStore: EventStore;
   repo: CitationRepoAccess;
   kb: CitationKbAccess;
   /**
@@ -97,6 +100,22 @@ export function buildApp(deps: AppDeps): Hono<Env> {
   const app = new Hono<Env>();
   app.onError(makeErrorResponder(STATUS_BY_CODE));
   app.use("/api/*", authMiddleware(deps.tokens, NO_OP_PRESENCE));
+
+  app.get("/api/events", (c) => {
+    const raw = Number(c.req.query("since") ?? "0");
+    const since = Number.isFinite(raw) && raw >= 0 ? raw : 0;
+    const envelopes = deps.eventStore.readSince(since);
+    return c.text(
+      envelopes.map((envelope) => JSON.stringify(envelope)).join("\n") +
+        (envelopes.length > 0 ? "\n" : ""),
+      200,
+      { "Content-Type": "application/x-ndjson" },
+    );
+  });
+  app.get(
+    "/api/events/follow",
+    followEventsRoute({ eventStore: deps.eventStore, presence: NO_OP_PRESENCE }),
+  );
 
   /**
    * The agent proposes a node. Round 1 put the reading on the agent and the

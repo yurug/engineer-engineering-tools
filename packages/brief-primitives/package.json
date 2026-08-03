@@ -1,6 +1,6 @@
 {
   "name": "@brief/primitives",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Validated-spec-to-visual renderers shared by backbrief tours, forebrief decision cards, inbrief, and the agent's own artifacts (kb/primitives/scope.md). Per-primitive entry points -- no barrel, see `exports`. ESM output (\"type\":\"module\", step 2 finding): tsc's default CommonJS emit put every `require(\"zod\")` behind a boundary Rollup cannot tree-shake through, so a DOM-only consumer's bundle paid for the whole zod runtime regardless of how much of it a spec schema actually used -- see src/envelope.ts's header and tools/refresh-primitives.sh's neighbor, the bundle-budget test in forebrief's web package.",
   "main": "dist/index.js",

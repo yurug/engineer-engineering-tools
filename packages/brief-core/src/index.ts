@@ -86,6 +86,8 @@ export {
 
 export { followEventsRoute, type FollowRouteDeps } from "./api/sse";
 
+export { pumpSseEvents, type PumpSseEventOptions } from "./cli/sse-events";
+
 export { mountStaticWeb } from "./static-web";
 
 export { attachWsHub, type WsHub, type WsHubDeps } from "./ws/hub";

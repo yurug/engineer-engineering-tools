@@ -1,6 +1,6 @@
 {
   "name": "@backbrief/shared",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Envelope/Citation/action/event types, zod schemas, content normalization, and the AppError/Result vocabulary shared by every backbrief package.",
   "main": "dist/index.js",

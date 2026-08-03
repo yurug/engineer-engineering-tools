@@ -9,7 +9,7 @@ After installing the public toolsuite, invoke commands as `backbrief …`.
 | -------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `backbrief serve [--repo DIR] [--focus diff:FROM..TO\|component:PATH\|system] [--title T] [--port N] [--open]` | Starts a session; prints `{url, token, port, sessionId, pid}` then daemonises.                                                                                                                     |
 | `backbrief act FILE.json` / `backbrief act -`                                                                  | Posts one action (a move, a card, a diagram) or an agent-postable event (`answer`, `open_finding`/`resolve_finding`, `kb_proposal`/`resolve_proposal`), and prints the citation validation report. |
-| `backbrief events [--since N] [--follow] [--timeout SECS]`                                                     | Prints the event log as JSONL. This is the agent's inbound channel.                                                                                                                                |
+| `backbrief events [--since N] [--follow] [--timeout SECS] [--actor human]`                                     | Prints the event log as JSONL; a timed follow exits on its first matching envelope. This is the agent's inbound channel.                                                                           |
 | `backbrief status`                                                                                             | `{running, sessionId, url, agentSeen, humanSeen}`, or `{running:false}`.                                                                                                                           |
 | `backbrief digest`                                                                                             | The cross-session state digest, in markdown: coverage, open questions and findings, recently understood ground.                                                                                    |
 | `backbrief stop`                                                                                               | Ends the session, flushes the digest, shuts the server down.                                                                                                                                       |
@@ -35,7 +35,7 @@ On a runtime that only wakes a background process when it exits, rather than per
 line, loop instead:
 
 ```bash
-backbrief events --follow --timeout 20
+backbrief events --actor human --since <lastCommittedSeq> --follow --timeout 20
 ```
 
 This exits after twenty seconds, or immediately on the first event, whichever comes first.

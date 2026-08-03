@@ -6,16 +6,22 @@ mastery in the browser.
 
 After installing the public toolsuite, invoke commands as `inbrief …`.
 
-| Command                                          | Does                                                                                                           |
-| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `inbrief serve [--repo DIR] [--port N] [--open]` | Starts a local session and prints its URL, tokens, port, session id, and PID.                                  |
-| `inbrief act FILE.json` / `inbrief act -`        | Posts an agent-authored node, agenda, answer, concession, finding, or close record.                            |
-| `inbrief status`                                 | Reports whether the server is running and the current coverage counts.                                         |
-| `inbrief propose [--out DIR]`                    | Prints durable material learned by the session, or writes proposals to an explicitly chosen scratch directory. |
-| `inbrief stop`                                   | Stops the server without claiming that the onboarding session was completed.                                   |
+| Command                                                                  | Does                                                                                                           |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------- |
+| `inbrief serve [--repo DIR] [--port N] [--open]`                         | Starts a local session and prints its URL, tokens, port, session id, and PID.                                  |
+| `inbrief act FILE.json` / `inbrief act -`                                | Posts an agent-authored node, agenda, answer, concession, finding, or close record.                            |
+| `inbrief events [--since N] [--follow] [--timeout SECS] [--actor human]` | Reads the event log; a timed follow exits on its first matching envelope.                                      |
+| `inbrief status`                                                         | Reports whether the server is running and the current coverage counts.                                         |
+| `inbrief propose [--out DIR]`                                            | Prints durable material learned by the session, or writes proposals to an explicitly chosen scratch directory. |
+| `inbrief stop`                                                           | Stops the server without claiming that the onboarding session was completed.                                   |
 
 The server binds only to `127.0.0.1`. Runtime discovery and credentials live
 under `.inbrief/`; the nested `.gitignore` excludes them.
+
+While the browser is open, the agent should dedicate a fast response sentinel
+to `inbrief events --actor human --since <lastCommittedSeq> --follow --timeout
+20`. It relaunches after each timeout or handled envelope. This is what lets a
+browser action resume the agent without a second “done” message in chat.
 
 ## Payloads accepted by `act`
 

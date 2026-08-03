@@ -141,6 +141,7 @@ export async function startServer(options: StartServerOptions): Promise<ServerHa
   const app = buildApp({
     tokens,
     session,
+    eventStore: store,
     repo: makeRepoAccess(options.repoRoot),
     kb: makeKbAccess(options.repoRoot),
     materialDir: config.materialDir,

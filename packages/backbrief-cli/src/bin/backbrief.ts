@@ -6,6 +6,7 @@
 // there is no seventh command and no flag that isn't in that contract --
 // growth belongs in the server/protocol, not here.
 import * as path from "node:path";
+import type { Actor } from "@backbrief/shared";
 import { extractFlag, hasFlag } from "../args";
 import { processIo } from "../output";
 import { runActCommand } from "../commands/act";
@@ -53,6 +54,9 @@ async function main(): Promise<number> {
         {
           since: Number(extractFlag(rest, "--since") ?? "0"),
           follow: hasFlag(rest, "--follow"),
+          ...(extractFlag(rest, "--actor") !== undefined
+            ? { actor: actorFlag(rest, "--actor") }
+            : {}),
           ...(timeoutSecs !== undefined ? { timeoutSecs } : {}),
         },
         { repoStartDir: process.cwd(), io: processIo },
@@ -70,6 +74,12 @@ async function main(): Promise<number> {
       );
       return 1;
   }
+}
+
+function actorFlag(argv: readonly string[], name: string): Actor {
+  const value = extractFlag(argv, name);
+  if (value === "agent" || value === "human" || value === "system") return value;
+  throw new Error(`${name} must be agent, human, or system`);
 }
 
 function numberFlag(argv: readonly string[], name: string): number | undefined {

@@ -1,6 +1,6 @@
 {
   "name": "@backbrief/server",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "The backbrief HTTP/WS server: event store, citation validation, session lifecycle.",
   "main": "dist/index.js",

@@ -12,8 +12,10 @@ import { runActCommand } from "../commands/act";
 import { runStatusCommand } from "../commands/status";
 import { runStopCommand } from "../commands/stop";
 import { runProposeCommand } from "../commands/propose";
+import { runEventsCommand } from "../commands/events";
+import type { Actor } from "@brief/shared";
 
-const COMMANDS = ["serve", "act", "status", "propose", "stop"] as const;
+const COMMANDS = ["serve", "act", "events", "status", "propose", "stop"] as const;
 
 async function main(): Promise<number> {
   const parsed = parseArgv(process.argv.slice(2));
@@ -45,6 +47,19 @@ async function main(): Promise<number> {
     }
     case "status":
       return runStatusCommand({ repoStartDir: cwd, io });
+    case "events": {
+      const actor = stringFlag(parsed, "actor");
+      return runEventsCommand({
+        repoStartDir: cwd,
+        since: numberFlag(parsed, "since") ?? 0,
+        follow: parsed.flags.get("follow") === true,
+        io,
+        ...(numberFlag(parsed, "timeout") !== undefined
+          ? { timeoutSecs: numberFlag(parsed, "timeout")! }
+          : {}),
+        ...(actor !== undefined ? { actor: parseActor(actor) } : {}),
+      });
+    }
     case "propose": {
       const out = stringFlag(parsed, "out");
       return runProposeCommand({ repoStartDir: cwd, io, ...(out !== undefined ? { out } : {}) });
@@ -58,6 +73,11 @@ async function main(): Promise<number> {
       io.writeErr(`inbrief: unknown command '${parsed.command}'. Try: ${COMMANDS.join(", ")}`);
       return EXIT_ERROR;
   }
+}
+
+function parseActor(value: string): Actor {
+  if (value === "agent" || value === "human" || value === "system") return value;
+  throw new Error("--actor must be agent, human, or system");
 }
 
 function readStdin(): Promise<string> {

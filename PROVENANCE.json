@@ -1,17 +1,17 @@
 {
-  "version": "0.2.0",
+  "version": "0.2.1",
   "publishedFrom": {
     "brief": {
-      "revision": "6da09dd20c6a9e2799318eb50f6fcb28664a2d71"
+      "revision": "2fdb7ba94742689129efa345b9ff590b81bb33bd"
     },
     "backbrief": {
-      "revision": "fde3d23e03eb7ca11b38a19cd0082352cfafd8f2"
+      "revision": "67505c31500f2aa6ad7fa51a9939ceba26eaa218"
     },
     "forebrief": {
-      "revision": "8ecc0110345c5ae3efe84692630e8778a7503e39"
+      "revision": "16d1b5a21ad7bd210f56668a90a1ecaa96c6c899"
     },
     "inbrief": {
-      "revision": "33fcab664bdf347ac415bb75a44e075ce20c0ed9"
+      "revision": "b5c410cd368f9f9ce46a3e82a6bee78675ffc6a7"
     }
   },
   "packages": [

@@ -11,8 +11,12 @@ fold decided rounds into this repo's `kb/` as an ordinary reviewable commit.
 
 ## Is this repo forebrief-enabled?
 
-`command -v forebrief && [ -f .forebrief/config.json ]`. If either check
-fails: forebrief is not set up here — fall back to writing
+Resolve Forebrief by trying `command -v forebrief`, then executable candidates
+`$(npm prefix -g)/bin/forebrief`, `$HOME/.npm-global/bin/forebrief`,
+`$HOME/.local/bin/forebrief`, and
+`$HOME/work/dev/forebrief/packages/cli/dist/bin/forebrief.js`; use the absolute
+path found. Then check `[ -f .forebrief/config.json ]`. Only when all binary
+candidates fail or the config is absent is Forebrief not set up here — fall back to writing
 `kb/questions-roundN.md` (spec-driven-dev's Phase 1 default) and stop reading
 this file. Never half-apply this skill.
 
@@ -29,7 +33,7 @@ Card and record shapes are forebrief's fixed public protocol. Before the first
 forebrief serve [--repo DIR] [--title T] [--port N] [--open]
 forebrief post FILE.json | -        # a round {cards:[...]} or one trickle {card:{...}}
 forebrief act FILE.json | -         # one record: decision, reconciliation, ask-context answer, ...
-forebrief events [--since N] [--follow] [--timeout SECS]
+forebrief events [--since N] [--follow] [--timeout SECS] [--actor human]
 forebrief status / forebrief digest / forebrief stop
 forebrief fold --round ID | --card ID [--out DIR]   # fold-in generator, see below
 ```
@@ -64,6 +68,14 @@ state, not silent rewritten history. The human's eventual answer becomes a
 `sit_down{open:true}` record is in force (human present, working a round with
 you). Outside one, the CLI warns but does not refuse: treat the warning as a
 bug in your own judgment, not a permission to ignore.
+
+During that sit-down, a response sentinel is mandatory. When subagents are
+available, assign a fast, low-cost one to repeatedly run `forebrief events
+--actor human --since <lastCommittedSeq> --follow --timeout 20`; otherwise run
+the same loop yourself. It relays each envelope immediately and advances its
+cursor only after the main agent reacts or explicitly acknowledges it. Human
+input preempts the next card. Drain the inbox before posting another card,
+closing the sit-down, stopping, or giving a final answer.
 
 ## Threads: ask-why and ask-context
 

@@ -10,8 +10,21 @@ signals for the engineer in the browser.
 
 ## Availability
 
-Run `command -v inbrief`. If absent, explain that onboarding cannot be recorded
-with inbrief and use the workflow's plain onboarding brief fallback.
+Resolve Inbrief robustly: try `command -v inbrief`, then executable candidates
+`$(npm prefix -g)/bin/inbrief`, `$HOME/.npm-global/bin/inbrief`,
+`$HOME/.local/bin/inbrief`, and
+`$HOME/work/dev/inbrief/packages/cli/dist/bin/inbrief.js`. Use the absolute path
+found for every command. Only if all candidates fail may you say Inbrief is
+absent. In that case, explain that it is installed by the public toolsuite, not
+as a standalone npm package, and offer:
+
+```sh
+git clone https://github.com/yurug/engineer-engineering-tools.git \
+  "$HOME/.local/share/engineer-engineering-tools"
+"$HOME/.local/share/engineer-engineering-tools/install.sh" inbrief
+```
+
+Do not fall back until the user declines installation or installation fails.
 
 Read the installed toolsuite's `docs/inbrief-cli.md` before the first session.
 If its location is unknown, resolve the binary (`command -v inbrief`), then
@@ -25,13 +38,27 @@ locate the toolsuite checkout that owns the linked `@inbrief/cli` package.
 3. Post one `kind:"node"` record at a time with `inbrief act -`.
 4. Post a prerequisite-respecting `kind:"agenda"` and tell the engineer the
    session URL.
-5. Let the engineer move mastery in the browser. Never post mastery or invent a
+5. Start the mandatory response sentinel described below, then let the engineer
+   move mastery in the browser. Never post mastery or invent a
    question in their name.
 6. If a node is contested, investigate the evidence. Correct the node; if the
    engineer was right, post `kind:"concession"`.
 7. Post `kind:"finding"` for actionable defects, not as documentation.
 8. The engineer closes the learning session; `inbrief stop` only stops the
    process.
+
+## Response sentinel — mandatory while the browser is open
+
+When the host supports subagents, launch a fast, low-cost subagent dedicated to
+the human inbox. Otherwise run the same loop yourself. Keep a
+`lastCommittedSeq`, repeatedly run `inbrief events --actor human --since
+<lastCommittedSeq> --follow --timeout 20`, and relay every envelope to the main
+agent immediately. Human input preempts the planned next step.
+
+Advance the cursor only after the main agent has reacted or explicitly confirmed
+that no action is needed, then relaunch. Before posting another node, stopping,
+or giving a final answer, drain the inbox once more. The sentinel never claims
+mastery or invents an engineer question.
 
 ## Node quality
 

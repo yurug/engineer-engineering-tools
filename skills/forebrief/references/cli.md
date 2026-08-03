@@ -29,7 +29,7 @@ when both the binary and this config file exist.
 | `forebrief serve [--repo DIR] [--title T] [--port N] [--open]` | Starts the server, prints `{url, token, port, sessionId, pid}`, daemonises. The URL carries the human token; the printed token is the agent credential. |
 | `forebrief post FILE\|-` | Posts a round of cards atomically. |
 | `forebrief act FILE\|-` | Logs one decision, reconciliation, or answer. |
-| `forebrief events [--since N] [--follow] [--timeout SECS]` | Reads the log as JSONL. |
+| `forebrief events [--since N] [--follow] [--timeout SECS] [--actor human]` | Reads the log as JSONL; timed follow exits on its first matching event. |
 | `forebrief status` | Reports whether a server is running and whether the round is closed. |
 | `forebrief digest` | Prints decisions, open provisionals, and pending questions as Markdown. |
 | `forebrief fold --round ID \| --card ID [--out DIR]` | Generates knowledge-base fold-in Markdown for the agent to commit. |

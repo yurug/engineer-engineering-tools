@@ -26,16 +26,16 @@ creates runtime files and their nested `.gitignore`, but deliberately does not
 invent fold-in destinations. The agent skill considers forebrief enabled only
 when both the binary and this config file exist.
 
-| Command                                                        | Does                                                                                                                                                    |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `forebrief serve [--repo DIR] [--title T] [--port N] [--open]` | Starts the server, prints `{url, token, port, sessionId, pid}`, daemonises. The URL carries the human token; the printed token is the agent credential. |
-| `forebrief post FILE\|-`                                       | Posts a round of cards, atomically. Schema in `kb/spec/data-model.md`.                                                                                  |
-| `forebrief act FILE\|-`                                        | Logs one record: a decision made in chat, a reconciliation, an answer.                                                                                  |
-| `forebrief events [--since N] [--follow] [--timeout SECS]`     | Reads the log as JSONL.                                                                                                                                 |
-| `forebrief status`                                             | Whether a server is running, and whether the round is closed.                                                                                           |
-| `forebrief digest`                                             | Decisions, open provisionals, and pending questions, as markdown.                                                                                       |
-| `forebrief fold --round ID \| --card ID [--out DIR]`           | Generates the knowledge-base fold-in markdown. The agent commits it.                                                                                    |
-| `forebrief stop`                                               | Ends the session and shuts the server down.                                                                                                             |
+| Command                                                                    | Does                                                                                                                                                    |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `forebrief serve [--repo DIR] [--title T] [--port N] [--open]`             | Starts the server, prints `{url, token, port, sessionId, pid}`, daemonises. The URL carries the human token; the printed token is the agent credential. |
+| `forebrief post FILE\|-`                                                   | Posts a round of cards, atomically. Schema in `kb/spec/data-model.md`.                                                                                  |
+| `forebrief act FILE\|-`                                                    | Logs one record: a decision made in chat, a reconciliation, an answer.                                                                                  |
+| `forebrief events [--since N] [--follow] [--timeout SECS] [--actor human]` | Reads the log as JSONL; a timed follow exits on its first matching envelope.                                                                            |
+| `forebrief status`                                                         | Whether a server is running, and whether the round is closed.                                                                                           |
+| `forebrief digest`                                                         | Decisions, open provisionals, and pending questions, as markdown.                                                                                       |
+| `forebrief fold --round ID \| --card ID [--out DIR]`                       | Generates the knowledge-base fold-in markdown. The agent commits it.                                                                                    |
+| `forebrief stop`                                                           | Ends the session and shuts the server down.                                                                                                             |
 
 ## Exit codes
 
