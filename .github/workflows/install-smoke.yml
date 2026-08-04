@@ -1,0 +1,55 @@
+name: Install smoke test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  install:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [20, 22, 24]
+
+    steps:
+      - name: Check out the distribution
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+
+      - name: Install into an isolated user environment
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          EET_CI_ROOT="$RUNNER_TEMP/eet-install"
+          export NPM_CONFIG_PREFIX="$EET_CI_ROOT/npm"
+          export EET_SKILLS_DIR="$EET_CI_ROOT/skills"
+          export PATH="$NPM_CONFIG_PREFIX/bin:$PATH"
+
+          mkdir -p "$NPM_CONFIG_PREFIX/bin" "$EET_SKILLS_DIR"
+          ./install.sh
+
+          for tool in backbrief forebrief inbrief; do
+            test "$(command -v "$tool")" = "$NPM_CONFIG_PREFIX/bin/$tool"
+            test -e "$NPM_CONFIG_PREFIX/bin/$tool"
+            test -L "$EET_SKILLS_DIR/$tool"
+            test "$(readlink "$EET_SKILLS_DIR/$tool")" = "$GITHUB_WORKSPACE/skills/$tool"
+
+            if "$tool" __install_smoke_test__ >"$EET_CI_ROOT/$tool.out" 2>&1; then
+              echo "$tool unexpectedly accepted the smoke-test command" >&2
+              exit 1
+            fi
+            grep -F "unknown command" "$EET_CI_ROOT/$tool.out"
+          done
