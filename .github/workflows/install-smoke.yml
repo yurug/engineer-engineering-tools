@@ -53,3 +53,33 @@ jobs:
             fi
             grep -F "unknown command" "$EET_CI_ROOT/$tool.out"
           done
+
+      # Each tool's `serve` prints the URL of its browser UI. Fetch that page and
+      # the script it loads: a server that cannot find its built web app still
+      # answers its API, so only these requests show that the UI ships.
+      - name: Serve each tool's web UI
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          EET_CI_ROOT="$RUNNER_TEMP/eet-install"
+          export PATH="$EET_CI_ROOT/npm/bin:$PATH"
+
+          for tool in backbrief forebrief inbrief; do
+            repo="$RUNNER_TEMP/serve-$tool"
+            git init -q "$repo"
+            (
+              cd "$repo"
+              "$tool" serve --repo "$repo" > serve.json
+              trap '"$tool" stop >/dev/null 2>&1 || :' EXIT
+
+              url=$(node -p 'require("./serve.json").url')
+              port=$(node -p 'require("./serve.json").port')
+              curl --fail --silent --show-error --output page.html "$url"
+
+              script=$(grep -o 'src="/[^"]*\.js"' page.html | head -n 1 | sed 's/^src="//; s/"$//')
+              test -n "$script" || { echo "$tool: the page loads no script" >&2; exit 1; }
+              curl --fail --silent --show-error --output /dev/null "http://127.0.0.1:$port$script"
+              echo "$tool: page and $script answer 200"
+            )
+          done
