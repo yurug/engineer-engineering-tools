@@ -241,7 +241,7 @@ export async function startServer(options: StartServerOptions): Promise<ServerHa
   // The URL `serve` prints is this same origin -- the browser's entire
   // entry point, so the built web SPA (if present; absent in every
   // server-package test, which never runs `vite build`) is mounted here.
-  await mountStaticWeb(app, options.webDistDir ?? path.join(__dirname, "../../web/dist"));
+  await mountStaticWeb(app, options.webDistDir ?? path.join(__dirname, "../../backbrief-web/dist"));
 
   // @hono/node-server's `serve()` return type is a union with the
   // http2/https server types because the SAME function handles all three

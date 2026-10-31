@@ -125,7 +125,7 @@ export async function startServer(options: StartServerOptions): Promise<ServerHa
   // entry point, so the built web SPA (if present; absent in every
   // server-package test, which never runs `vite build`) is mounted here,
   // same pattern as @backbrief/server's own `startServer` (mirrors ADR-001).
-  await mountStaticWeb(app, options.webDistDir ?? path.join(__dirname, "../../web/dist"));
+  await mountStaticWeb(app, options.webDistDir ?? path.join(__dirname, "../../forebrief-web/dist"));
 
   // ADR-006: no explicit --port -> try the repo's last-used one first (a
   // collision there falls back to ephemeral with a warning, never a hard

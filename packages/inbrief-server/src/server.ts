@@ -153,7 +153,7 @@ export async function startServer(options: StartServerOptions): Promise<ServerHa
   });
 
   // Mounted before listen so the very first request can be the browser's.
-  await mountStaticWeb(app, options.webDistDir ?? path.join(__dirname, "../../web/dist"));
+  await mountStaticWeb(app, options.webDistDir ?? path.join(__dirname, "../../inbrief-web/dist"));
 
   const server = await listen(app.fetch.bind(app), options.port ?? 0);
   const port = addressPort(server);
